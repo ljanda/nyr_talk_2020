@@ -1,0 +1,180 @@
+---
+title: "R-Ladies NYC: An Analysis"
+subtitle: "⚔<br/>NYR 2020"
+author: "Ludmila Janda"
+institute: "Amplify"
+date: "2020/08/14"
+output:
+  xaringan::moon_reader:
+    css: [default, kunoichi, rladies-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+# remotes::install_github("rladies/meetupr")
+library(meetupr)
+library(purrr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(ggplot2)
+library(ggrepel)
+library(tm)
+library(wordcloud)
+set.seed(424)
+```
+
+```{r}
+# https://www.fontsquirrel.com/fonts/open-sans
+# library(extrafont)
+# font_import()
+# loadfonts()
+```
+
+
+```{r}
+theme_rladies <- function () { 
+  font = "OpenSans"
+  theme_minimal() %+replace% 
+    theme(
+      #grid elements
+      # panel.grid.major = element_blank(),    
+      panel.grid.minor = element_blank(),    
+      axis.ticks = element_blank(),          
+      #text elements
+      plot.title = element_text(             
+                   family = font,            
+                   size = 20,                
+                   face = 'bold',            
+                   hjust = 0,                
+                   vjust = 2),               
+    
+      plot.subtitle = element_text(         
+                   family = font,           
+                   size = 14),              
+    
+      plot.caption = element_text(         
+                   family = font,          
+                   size = 9,               
+                   hjust = 1),             
+      
+      axis.title = element_text(           
+                   family = font,          
+                   size = 10),             
+      
+      axis.text = element_text(            
+                   family = font,          
+                   size = 9),              
+      
+      axis.text.x = element_text(          
+                    margin = margin(5, b = 10))
+    )
+}
+
+```
+
+
+
+![R-Ladies](images/rladies_hex.png)
+---
+
+WHAT IS THIS TALK?
+
+- An in-depth look at the R-Ladies NYC meetup data
+- An attempt to quantify our existence
+- A look at the code that we use to do this
+
+
+---
+
+```{r}
+urlname <- "rladies-newyork"
+events <- get_events(urlname, "past")
+glimpse(events)
+```
+
+--- 
+
+```{r}
+e1 <- events %>% 
+  filter(!str_detect(name, "Book Club"), 
+         !str_detect(name, "book club"), 
+         !str_detect(name, "Social"), 
+         !str_detect(name, "Workshop")) 
+```
+
+```{r}
+summary(e1$yes_rsvp_count)
+```
+
+
+```{r}
+ggplot(e1, aes(local_date, yes_rsvp_count)) + 
+  geom_line(color = "#88398a") +
+  geom_point(color = "#88398a", size = 2) + 
+  labs(x = "Date", y = "RSVP Count") + 
+  theme_rladies()
+```
+
+```{r}
+e2 <- e1 %>% 
+  mutate(name = ifelse(yes_rsvp_count < 80, "", name))
+ggplot(e2, aes(local_date, yes_rsvp_count, label = name)) + 
+  geom_line(color = "#88398a") +
+  geom_point(color = "#88398a", size = 2) + 
+  geom_label_repel(size = 2.5, force = 5, nudge_y = -5, segment.color = "grey60") + 
+  labs(x = "Date", y = "RSVP Count") + 
+  theme_rladies()
+```
+
+
+```{r, echo=FALSE, warning=FALSE, out.width = '800px'}
+# http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
+e3 <- events %>% 
+  mutate(description = str_remove_all(description, "R-Ladies"),
+         description = str_remove_all(description, "R-ladies"),
+         description = str_remove_all(description, "Rladies"),
+         description = str_remove_all(description, "New York"),
+         description = str_remove_all(description, "NYC"),
+         description = str_remove_all(description, "Online event"),
+         description = str_remove_all(description, "Book Club"), 
+         description = str_remove_all(description, "book club"), 
+         description = str_remove_all(description, "Workshop"), 
+         description = str_remove_all(description, "ladies"))
+text <- e3$description
+text <- gsub("[[:punct:]]|[[:digit:]]", "", text)
+docs <- Corpus(VectorSource(text))
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+# Convert the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Remove english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# specify your stopwords as a character vector
+docs <- tm_map(docs, removeWords, c("and", "with", "the", "will", 
+                                    "event", "can", "using", 
+                                    "she", "for", "from", "not", "how", 
+                                    "please", "also", "use", "talk", "pwe", 
+                                    "want", "email", "twitter", "phd", "well", 
+                                    "columbia", "university", "kaelen", "emily", 
+                                    "erin", "elizabeth")) 
+docs <- tm_map(docs, stripWhitespace)
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words = 200, random.order = FALSE, rot.per = 0.35, 
+          colors = brewer.pal(10, "Paired"))
+```
+
+---
+
+

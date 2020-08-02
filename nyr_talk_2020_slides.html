@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>R-Ladies NYC: An Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Ludmila Janda" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/kunoichi.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R-Ladies NYC: An Analysis
+## ⚔<br/>NYR 2020
+### Ludmila Janda
+### Amplify
+### 2020/08/14
+
+---
+
+
+
+
+
+
+```r
+# https://www.fontsquirrel.com/fonts/open-sans
+# library(extrafont)
+# font_import()
+# loadfonts()
+```
+
+
+
+```r
+theme_rladies &lt;- function () { 
+  font = "OpenSans"
+  theme_minimal() %+replace% 
+    theme(
+      #grid elements
+      # panel.grid.major = element_blank(),    
+      panel.grid.minor = element_blank(),    
+      axis.ticks = element_blank(),          
+      #text elements
+      plot.title = element_text(             
+                   family = font,            
+                   size = 20,                
+                   face = 'bold',            
+                   hjust = 0,                
+                   vjust = 2),               
+    
+      plot.subtitle = element_text(         
+                   family = font,           
+                   size = 14),              
+    
+      plot.caption = element_text(         
+                   family = font,          
+                   size = 9,               
+                   hjust = 1),             
+      
+      axis.title = element_text(           
+                   family = font,          
+                   size = 10),             
+      
+      axis.text = element_text(            
+                   family = font,          
+                   size = 9),              
+      
+      axis.text.x = element_text(          
+                    margin = margin(5, b = 10))
+    )
+}
+```
+
+
+
+![R-Ladies](images/rladies_hex.png)
+---
+
+WHAT IS THIS TALK?
+
+- An in-depth look at the R-Ladies NYC meetup data
+- An attempt to quantify our existence
+- A look at the code that we use to do this
+
+
+---
+
+
+```r
+urlname &lt;- "rladies-newyork"
+events &lt;- get_events(urlname, "past")
+```
+
+```
+## Meetup is moving to OAuth *only* as of 2019-08-15. Set
+## `meetupr.use_oauth = FALSE` in your .Rprofile, to use
+## the legacy `api_key` authorization.
+```
+
+```
+## Downloading 47 record(s)...
+```
+
+```r
+glimpse(events)
+```
+
+```
+## Observations: 47
+## Variables: 21
+## $ id              &lt;chr&gt; "235073330", "237328664", "237573729", "238954081", "…
+## $ name            &lt;chr&gt; "Launching Rladies New York!", "R-Ladies New York Lec…
+## $ created         &lt;dttm&gt; 2016-10-24 00:36:35, 2017-01-30 19:58:06, 2017-02-09…
+## $ status          &lt;chr&gt; "past", "past", "past", "past", "past", "past", "past…
+## $ time            &lt;dttm&gt; 2016-11-21 18:15:00, 2017-02-21 18:30:00, 2017-03-11…
+## $ local_date      &lt;date&gt; 2016-11-21, 2017-02-21, 2017-03-11, 2017-04-18, 2017…
+## $ local_time      &lt;chr&gt; "18:15", "18:30", "11:00", "18:30", "11:00", "14:00",…
+## $ waitlist_count  &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ yes_rsvp_count  &lt;int&gt; 57, 55, 21, 46, 26, 20, 23, 24, 57, 55, 44, 51, 42, 4…
+## $ venue_id        &lt;int&gt; 24906271, 24498435, 25038699, 25153575, 25038699, 884…
+## $ venue_name      &lt;chr&gt; "Federal Building", "Flatiron Health", "Rizzoli Books…
+## $ venue_lat       &lt;dbl&gt; 40.75000, 40.74216, 40.74000, 40.75000, 40.74000, 40.…
+## $ venue_lon       &lt;dbl&gt; -73.99000, -73.98989, -73.99000, -73.98000, -73.99000…
+## $ venue_address_1 &lt;chr&gt; "90 church street, 4th floor ", "200 5th Ave, 8th Flo…
+## $ venue_city      &lt;chr&gt; "New York ", "New York", "New York ", "New York", "Ne…
+## $ venue_state     &lt;chr&gt; "NY", "NY", "NY", "NY", "NY", "NY", NA, "NY", NA, "NY…
+## $ venue_zip       &lt;chr&gt; "10001", "", "10010", "10016", "10010", "10002", NA, …
+## $ venue_country   &lt;chr&gt; "us", "us", "us", "us", "us", "us", "US", "us", "US",…
+## $ description     &lt;chr&gt; "&lt;p&gt;Join us for the launch of New York's first R comm…
+## $ link            &lt;chr&gt; "https://www.meetup.com/rladies-newyork/events/235073…
+## $ resource        &lt;list&gt; [[1.477284e+12, 8100000, "235073330", "Launching Rla…
+```
+
+--- 
+
+
+```r
+e1 &lt;- events %&gt;% 
+  filter(!str_detect(name, "Book Club"), 
+         !str_detect(name, "book club"), 
+         !str_detect(name, "Social"), 
+         !str_detect(name, "Workshop")) 
+```
+
+
+```r
+summary(e1$yes_rsvp_count)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   38.00   55.00   66.00   68.72   82.00  103.00
+```
+
+
+
+```r
+ggplot(e1, aes(local_date, yes_rsvp_count)) + 
+  geom_line(color = "#88398a") +
+  geom_point(color = "#88398a", size = 2) + 
+  labs(x = "Date", y = "RSVP Count") + 
+  theme_rladies()
+```
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+
+```r
+e2 &lt;- e1 %&gt;% 
+  mutate(name = ifelse(yes_rsvp_count &lt; 80, "", name))
+ggplot(e2, aes(local_date, yes_rsvp_count, label = name)) + 
+  geom_line(color = "#88398a") +
+  geom_point(color = "#88398a", size = 2) + 
+  geom_label_repel(size = 2.5, force = 5, nudge_y = -5, segment.color = "grey60") + 
+  labs(x = "Date", y = "RSVP Count") + 
+  theme_rladies()
+```
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-8-1.png" width="800px" /&gt;
+
+---
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
