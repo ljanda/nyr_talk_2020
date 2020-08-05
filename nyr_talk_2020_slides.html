@@ -25,86 +25,43 @@ class: center, middle, inverse, title-slide
 
 
 
-```r
-# https://www.fontsquirrel.com/fonts/open-sans
-# library(extrafont)
-# font_import()
-# loadfonts()
-```
 
 
 
-```r
-theme_rladies &lt;- function () { 
-  font = "OpenSans"
-  theme_minimal() %+replace% 
-    theme(
-      #grid elements
-      # panel.grid.major = element_blank(),    
-      panel.grid.minor = element_blank(),    
-      axis.ticks = element_blank(),          
-      #text elements
-      plot.title = element_text(             
-                   family = font,            
-                   size = 20,                
-                   face = 'bold',            
-                   hjust = 0,                
-                   vjust = 2),               
-    
-      plot.subtitle = element_text(         
-                   family = font,           
-                   size = 14),              
-    
-      plot.caption = element_text(         
-                   family = font,          
-                   size = 9,               
-                   hjust = 1),             
-      
-      axis.title = element_text(           
-                   family = font,          
-                   size = 10),             
-      
-      axis.text = element_text(            
-                   family = font,          
-                   size = 9),              
-      
-      axis.text.x = element_text(          
-                    margin = margin(5, b = 10))
-    )
-}
-```
+
+
+
 
 
 
 ![R-Ladies](images/rladies_hex.png)
 ---
 
-WHAT IS THIS TALK?
+# WHAT IS THIS TALK?
+
+--
 
 - An in-depth look at the R-Ladies NYC meetup data
+
+--
+
 - An attempt to quantify our existence
-- A look at the code that we use to do this
+
+--
+
+- A look at the code that used to do this (and possibly using some fun functions that might be new to you)
 
 
 ---
 
+# Getting data from our meetup page using meetupr
+
 
 ```r
 urlname &lt;- "rladies-newyork"
-events &lt;- get_events(urlname, "past")
-```
+# events &lt;- get_events(urlname, "past")
+# events &lt;- write_rds(events, here::here("data/events.rds")
 
-```
-## Meetup is moving to OAuth *only* as of 2019-08-15. Set
-## `meetupr.use_oauth = FALSE` in your .Rprofile, to use
-## the legacy `api_key` authorization.
-```
-
-```
-## Downloading 47 record(s)...
-```
-
-```r
 glimpse(events)
 ```
 
@@ -134,11 +91,76 @@ glimpse(events)
 ## $ resource        &lt;list&gt; [[1.477284e+12, 8100000, "235073330", "Launching Rla…
 ```
 
---- 
+
+---
+
+# Event RSVP Counts on Average?
 
 
 ```r
-e1 &lt;- events %&gt;% 
+summary(events$yes_rsvp_count)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   20.00   42.00   55.00   56.68   71.50  103.00
+```
+
+
+---
+
+# Are our RSVP counts trending upwards?
+
+
+```r
+ggplot(events, aes(local_date, yes_rsvp_count)) + 
+  geom_line(color = "#88398a") +
+  geom_point(color = "#88398a", size = 2) + 
+  labs(x = "Date", y = "RSVP Count") + 
+  theme_rladies()
+```
+
+--- 
+
+# Are our RSVP counts trending upwards?
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+
+---
+
+# What are those low RSVP count events?
+
+
+```r
+events_low_labels &lt;- events %&gt;% 
+  mutate(name = ifelse(yes_rsvp_count &gt; 35, "", name), 
+         name = str_remove(name, "R-ladies"), 
+         name = str_remove(name, "R-Ladies"),
+         name = str_remove(name, "R Ladies"))
+
+ggplot(events_low_labels, aes(local_date, yes_rsvp_count, label = name)) + 
+  geom_line(color = "#88398a") +
+  geom_point(color = "#88398a", size = 2) + 
+  geom_label_repel(size = 2.5, force = 5, nudge_y = 5, segment.color = "grey60") + 
+  labs(x = "Date", y = "RSVP Count") + 
+  theme_rladies()
+```
+
+---
+
+# What are those low RSVP count events?
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+
+---
+
+# Filter out expectedly small events
+
+
+```r
+events_normal &lt;- events %&gt;% 
   filter(!str_detect(name, "Book Club"), 
          !str_detect(name, "book club"), 
          !str_detect(name, "Social"), 
@@ -147,7 +169,7 @@ e1 &lt;- events %&gt;%
 
 
 ```r
-summary(e1$yes_rsvp_count)
+summary(events_normal$yes_rsvp_count)
 ```
 
 ```
@@ -155,38 +177,228 @@ summary(e1$yes_rsvp_count)
 ##   38.00   55.00   66.00   68.72   82.00  103.00
 ```
 
+![R-Ladies](images/youreallylikeme.jpeg)
+
+
+---
+
+# Trending Up?
 
 
 ```r
-ggplot(e1, aes(local_date, yes_rsvp_count)) + 
+ggplot(events_normal, aes(local_date, yes_rsvp_count)) + 
   geom_line(color = "#88398a") +
   geom_point(color = "#88398a", size = 2) + 
   labs(x = "Date", y = "RSVP Count") + 
   theme_rladies()
 ```
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+# Trending Up?
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+---
+
+# What were those "popular" events?
 
 
 ```r
-e2 &lt;- e1 %&gt;% 
+events_normal_labels &lt;- events_normal %&gt;% 
   mutate(name = ifelse(yes_rsvp_count &lt; 80, "", name))
-ggplot(e2, aes(local_date, yes_rsvp_count, label = name)) + 
-  geom_line(color = "#88398a") +
-  geom_point(color = "#88398a", size = 2) + 
+ggplot(events_normal_labels, aes(local_date, yes_rsvp_count, label = name)) + 
+  geom_col(fill = "#88398a") +
   geom_label_repel(size = 2.5, force = 5, nudge_y = -5, segment.color = "grey60") + 
   labs(x = "Date", y = "RSVP Count") + 
   theme_rladies()
 ```
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
-
-
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-8-1.png" width="800px" /&gt;
 
 ---
 
+# What were those "popular" events?
 
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+---
+
+# Look at members data 
+
+
+```r
+# members &lt;- get_members(urlname)
+# members &lt;- write_rds(members, here::here("data/members.rds"))
+
+glimpse(members)
+```
+
+```
+## Observations: 1,856
+## Variables: 12
+## $ id         &lt;int&gt; 202097213, 251470805, 198578118, 208748698, 201077483, 215…
+## $ name       &lt;chr&gt; "Emily Dodwell", "R-Ladies Global", "Gabriela Hempfling", …
+## $ bio        &lt;chr&gt; "Data Scientist in the Statistics Research Department at A…
+## $ status     &lt;chr&gt; "active", "active", "active", "active", "active", "active"…
+## $ created    &lt;dttm&gt; 2016-11-04 14:35:53, 2018-04-29 06:33:13, 2016-11-22 10:0…
+## $ city       &lt;chr&gt; "New York", "San Francisco", "New York", "New York", "New …
+## $ country    &lt;chr&gt; "us", "us", "us", "us", "us", "us", "us", "us", "us", "us"…
+## $ state      &lt;chr&gt; "NY", "CA", "NY", "NY", "NY", "NY", "NY", "NY", "NY", "NY"…
+## $ lat        &lt;dbl&gt; 40.71, 37.78, 40.73, 40.74, 40.75, 40.76, 40.83, 40.80, 40…
+## $ lon        &lt;dbl&gt; -74.01, -122.42, -73.99, -73.99, -74.00, -73.91, -73.95, -…
+## $ photo_link &lt;chr&gt; "https://secure.meetupstatic.com/photos/member/c/6/3/a/mem…
+## $ resource   &lt;list&gt; [[202097213, "Emily Dodwell", "Data Scientist in the Stat…
+```
+
+---
+
+Count of new members by month
+
+
+```r
+members_month &lt;- members %&gt;% 
+  mutate(year_month = as.Date(floor_date(created, "month"))) %&gt;% 
+  group_by(year_month) %&gt;% 
+  summarise(count_new_members = n()) 
+
+ggplot(members_month, aes(year_month, count_new_members)) + 
+  geom_col() + 
+  scale_x_date(date_breaks = '6 months', date_labels = '%Y-%m') +
+  theme_rladies() 
+```
+
+
+---
+
+Count of new members by month
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+
+
+---
+
+# Get new members by nearest upcoming event
+ 
+
+```r
+# group by day and get count of new accounts 
+new_members &lt;- members %&gt;% 
+  mutate(date = as.Date(created)) %&gt;% 
+  group_by(date) %&gt;% 
+  summarise(count_new_members = n()) %&gt;% 
+  complete(date = seq.Date(min(date), max(date), by = "day")) # get all the days
+
+# make event dataset to merge with
+events_dates &lt;- events %&gt;% 
+  select(date = local_date, name) 
+
+
+members_events_count &lt;- left_join(new_members, events_dates, by = "date") %&gt;%
+  mutate(event_flag = ifelse(!is.na(name), 1, 0), 
+         event_group = cumsum(event_flag) - event_flag) %&gt;% 
+  group_by(event_group) %&gt;% 
+  summarise(new_members = sum(count_new_members, na.rm = TRUE))
+
+members_events_groups &lt;- left_join(new_members, events_dates, by = "date") %&gt;% 
+  mutate(event_flag = ifelse(!is.na(name), 1, 0), 
+         event_group = cumsum(event_flag) - event_flag) %&gt;% 
+  filter(!is.na(name)) %&gt;% 
+  distinct(event_group, name, date)
+
+members_events &lt;- left_join(members_events_groups, 
+                            members_events_count, by = "event_group") %&gt;% 
+  mutate(name = ifelse(new_members &lt; 50, "", name))
+```
+
+
+---
+
+# New members by Nearest Upcoming Event
+
+
+```r
+ggplot(members_events, aes(date, new_members, label = name)) + 
+  geom_col() + 
+  geom_label_repel(size = 2.5, force = 5, nudge_y = 10, segment.color = "grey60") + 
+  labs(x = NULL, y = "New Member Count", 
+       title = "Count of New Members Prior to Each Event") +
+  theme_rladies() 
+```
+
+
+---
+
+# New members by Nearest Upcoming Event
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+
+
+---
+
+# Member counts with events 
+
+
+```r
+members_events_all_days &lt;- left_join(new_members, events_dates, by = "date") %&gt;% 
+  mutate(event_flag = factor(ifelse(!is.na(name), 1, 0)), 
+         count_new_members = ifelse(is.na(count_new_members), 0, count_new_members), 
+         year = year(date))
+
+ggplot(members_events_all_days, aes(date, count_new_members, fill = event_flag)) + 
+  geom_col() + 
+  facet_wrap(~year, scales = "free") +
+  scale_fill_manual(values = c("#D3D3D3", "#88398a")) +
+  labs(x = NULL, y = "New Member Count") +
+  theme_rladies() 
+```
+
+---
+
+# Member counts with events 
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+
+--- 
+
+# Hadley Wickham Bump?
+
+
+```r
+members_events &lt;- left_join(members_events_groups, 
+                            members_events_count, by = "event_group") %&gt;% 
+  mutate(name = 
+           ifelse(name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
+                  name, ""))
+
+ggplot(members_events, aes(date, new_members, label = name)) + 
+  geom_col() + 
+  geom_label_repel(size = 2.5, force = 5, nudge_y = 10, segment.color = "grey60") + 
+  labs(x = NULL, y = "New Member Count", 
+       title = "Count of New Members Prior to Each Event") +
+  theme_rladies() 
+```
+
+--- 
+
+# Hadley Wickham Bump?
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+
+
+---
+
+Map of Event Locations
+
+
+---
+
+Word Cloud
+
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-26-1.png" width="800px" /&gt;
+
+---
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
