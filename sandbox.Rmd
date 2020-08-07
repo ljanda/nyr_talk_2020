@@ -10,12 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-urlname <- "rladies-newyork"
-events <- get_events(urlname, "past")
-```
-
-
-```{r}
 
 library(meetupr)
 library(purrr)
@@ -23,9 +17,16 @@ library(dplyr)
 library(tidyr)
 library(lubridate)
 library(ggplot2)
+```
 
 
+```{r}
+urlname <- "rladies-newyork"
+events <- get_events(urlname, "past")
+```
 
+```{r}
+get_event_comments(urlname, event_id = "235073330")
 
 
 ```

@@ -14,7 +14,6 @@ output:
       countIncrementalSlides: false
 ---
 
-
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 # remotes::install_github("rladies/meetupr")
@@ -30,7 +29,8 @@ library(ggplot2)
 library(ggrepel)
 library(tm)
 library(wordcloud)
-library(ggmap)
+library(maps)
+library(nycmaps)
 ```
 
 ```{r include=FALSE}
@@ -45,6 +45,7 @@ library(ggmap)
 # data
 events <- read_rds(here::here("data/events.rds"))
 members <- read_rds(here::here("data/members.rds"))
+all_event_attendees <- read_rds(here::here("data/all_event_attendees.rds"))
 ```
 
 
@@ -103,16 +104,50 @@ theme_rladies <- function () {
 
 ---
 
+WHAT IS R-LADIES?
+
+
+---
+
 # Getting data from our meetup page using meetupr
 
-```{r}
-urlname <- "rladies-newyork"
-# events <- get_events(urlname, "past")
-# events <- write_rds(events, here::here("data/events.rds")
+[meetupr](https://github.com/rladies/meetupr)
 
+```{r eval=FALSE}
+urlname <- "rladies-newyork"
+events <- get_events(urlname, "past")
+```
+
+```{r}
 glimpse(events)
 ```
 
+
+---
+
+# Getting data from our meetup page using meetupr
+
+```{r eval=FALSE}
+members <- get_members(urlname)
+```
+
+```{r}
+glimpse(members)
+```
+
+
+---
+
+# Number of Events and Members
+
+```{r}
+nrow(events)
+```
+
+
+```{r}
+nrow(members)
+```
 
 ---
 
@@ -135,7 +170,8 @@ ggplot(events, aes(local_date, yes_rsvp_count)) +
   theme_rladies()
 ```
 
---- 
+
+---
 
 # Are our RSVP counts trending upwards?
 
@@ -166,6 +202,7 @@ ggplot(events_low_labels, aes(local_date, yes_rsvp_count, label = name)) +
   labs(x = "Date", y = "RSVP Count") + 
   theme_rladies()
 ```
+
 
 ---
 
@@ -231,6 +268,7 @@ ggplot(events_normal, aes(local_date, yes_rsvp_count)) +
   theme_rladies()
 ```
 
+
 ---
 
 # What were those "popular" events?
@@ -260,16 +298,19 @@ ggplot(events_normal_labels, aes(local_date, yes_rsvp_count, label = name)) +
   theme_rladies()
 ```
 
+
 ---
 
 # Look at members data 
 
-```{r}
-# members <- get_members(urlname)
-# members <- write_rds(members, here::here("data/members.rds"))
+```{r eval=FALSE}
+members <- get_members(urlname)
+```
 
+```{r}
 glimpse(members)
 ```
+
 
 ---
 
@@ -320,14 +361,23 @@ new_members <- members %>%
 # make event dataset to merge with
 events_dates <- events %>% 
   select(date = local_date, name) 
+```
 
 
+---
+
+```{r}
+# merge members with complete dates and events 
+# get counts by event
+# include day of event in the group prior to the event
 members_events_count <- left_join(new_members, events_dates, by = "date") %>%
   mutate(event_flag = ifelse(!is.na(name), 1, 0), 
          event_group = cumsum(event_flag) - event_flag) %>% 
   group_by(event_group) %>% 
   summarise(new_members = sum(count_new_members, na.rm = TRUE))
 
+# merge members with complete dates and events 
+# get event dates for event groups
 members_events_groups <- left_join(new_members, events_dates, by = "date") %>% 
   mutate(event_flag = ifelse(!is.na(name), 1, 0), 
          event_group = cumsum(event_flag) - event_flag) %>% 
@@ -368,7 +418,7 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 ```
 
 
---- 
+---
 
 # Hadley Wickham Bump?
 
@@ -388,7 +438,7 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 ```
 
 
---- 
+---
 
 # Hadley Wickham Bump?
 
@@ -426,6 +476,7 @@ ggplot(members_events_all_days, aes(date, count_new_members, fill = event_flag))
   theme_rladies() 
 ```
 
+
 ---
 
 # Member counts with events 
@@ -445,56 +496,97 @@ ggplot(members_events_all_days, aes(date, count_new_members, fill = event_flag))
 ```
 
 
---- 
+---
 
-# Hadley Wickham Bump?
+# Loyalty
 
 ```{r eval=FALSE}
-members_events <- left_join(members_events_groups, 
-                            members_events_count, by = "event_group") %>% 
-  mutate(name = 
-           ifelse(name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
-                  name, ""))
+# all attendees for one event
+attendees <- get_event_attendees(urlname, event_id = "235073330")
 
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
-  geom_label_repel(size = 2.5, force = 5, nudge_y = 10, segment.color = "grey60") + 
-  labs(x = NULL, y = "New Member Count", 
-       title = "Count of New Members Prior to Each Event") +
-  theme_rladies() 
-```
+# get all event ids 
+event_ids <- events$id
 
-
---- 
-
-# Hadley Wickham Bump?
-
-```{r echo=FALSE}
-members_events <- left_join(members_events_groups, 
-                            members_events_count, by = "event_group") %>% 
-  mutate(name = 
-           ifelse(name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
-                  name, ""))
-
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
-  geom_label_repel(size = 2.5, force = 5, nudge_y = 10, segment.color = "grey60") + 
-  labs(x = NULL, y = "New Member Count", 
-       title = "Count of New Members Prior to Each Event") +
-  theme_rladies() 
+# get attendees for all the events
+all_event_attendees <- 
+  event_ids %>% 
+  map_dfr(slowly(~(get_event_attendees(urlname, event_id = .)))) 
 ```
 
 
 ---
 
-Map of Event Locations
+# Loyalty
+
+```{r}
+attendee_rsvp_counts <- 
+  all_event_attendees %>% 
+  filter(id != 0) %>% 
+  group_by(name, id) %>% 
+  summarise(count_events_rsvp = n())
+
+ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
+  geom_histogram(binwidth = 1) +
+  labs(x = "Number of Events Attended", y = "Count") +
+  theme_rladies()
+```
 
 
 ---
 
-Word Cloud
+# R-Ladies NYC Number One Fan 
 
-```{r, echo=FALSE, warning=FALSE, out.width = '800px'}
+```{r}
+summary(attendee_rsvp_counts$count_events_rsvp)
+```
+
+
+---
+
+# R-Ladies NYC Number One Fan 
+
+```{r}
+subset(attendee_rsvp_counts, 
+       name == "Ludmila Janda", 
+       select = count_events_rsvp)
+```
+
+
+---
+
+# Map of Event Locations
+
+```{r}
+nyc <- map_data("nyc")
+
+ggplot() + 
+  geom_polygon(data = nyc, 
+               aes(x = long, y = lat, group = group),
+               fill = "white", 
+               color = "darkgrey") + 
+  geom_point(data = events, 
+             aes(x = venue_lon, y = venue_lat), 
+             alpha = 0.25, 
+             color = "#88398a") +
+  coord_fixed(1) + 
+  # scale_x_continuous(limits = c(-74.15, -73.9), expand = c(0, 0)) +
+  # scale_y_continuous(limits = c(40.65, 40.9), expand = c(0, 0)) +
+  labs(x = "", y = "", title = "Event Locations") +
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "white"),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
+
+
+---
+
+# Word Cloud - Event Descriptions
+
+```{r echo=FALSE, warning=FALSE, out.width='800px'}
 # http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
 e3 <- events %>% 
   mutate(description = str_remove_all(description, "R-Ladies"),
@@ -535,3 +627,49 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 ```
 
 ---
+
+# Word Cloud
+
+```{r, eval=FALSE, warning=FALSE}
+# http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
+e3 <- events %>% 
+  mutate(description = str_remove_all(description, "R-Ladies"),
+         description = str_remove_all(description, "R-ladies"),
+         description = str_remove_all(description, "Rladies"),
+         description = str_remove_all(description, "New York"),
+         description = str_remove_all(description, "NYC"),
+         description = str_remove_all(description, "Online event"),
+         description = str_remove_all(description, "Book Club"), 
+         description = str_remove_all(description, "book club"), 
+         description = str_remove_all(description, "Workshop"), 
+         description = str_remove_all(description, "ladies"))
+text <- e3$description
+text <- gsub("[[:punct:]]|[[:digit:]]", "", text)
+docs <- Corpus(VectorSource(text))
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+# Convert the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Remove english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# specify your stopwords as a character vector
+docs <- tm_map(docs, removeWords, c("and", "with", "the", "will", 
+                                    "event", "can", "using", 
+                                    "she", "for", "from", "not", "how", 
+                                    "please", "also", "use", "talk", "pwe", 
+                                    "want", "email", "twitter", "phd", "well", 
+                                    "columbia", "university", "kaelen", "emily", 
+                                    "erin", "elizabeth")) 
+docs <- tm_map(docs, stripWhitespace)
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words = 200, random.order = FALSE, rot.per = 0.35, 
+          colors = brewer.pal(10, "Paired"))
+```
+
+---
+
+# Word Cloud - Comments
