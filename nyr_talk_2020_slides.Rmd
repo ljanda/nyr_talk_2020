@@ -1,6 +1,6 @@
 ---
 title: "R-Ladies NYC: An Analysis"
-subtitle: "⚔<br/>NYR 2020"
+subtitle: "<br/>NYR 2020"
 author: "Ludmila Janda"
 institute: "Amplify"
 date: "2020/08/14"
@@ -82,7 +82,9 @@ theme_rladies <- function () {
 
 ```
 
+---
 
+# WHAT IS R-LADIES?
 
 ![R-Ladies](images/rladies_hex.png)
 ---
@@ -104,12 +106,7 @@ theme_rladies <- function () {
 
 ---
 
-WHAT IS R-LADIES?
-
-
----
-
-# Getting data from our meetup page using meetupr
+# Getting data using meetupr
 
 [meetupr](https://github.com/rladies/meetupr)
 
@@ -125,7 +122,7 @@ glimpse(events)
 
 ---
 
-# Getting data from our meetup page using meetupr
+# Getting data using meetupr
 
 ```{r eval=FALSE}
 members <- get_members(urlname)
@@ -518,7 +515,7 @@ all_event_attendees <-
 
 # Loyalty
 
-```{r}
+```{r eval=FALSE}
 attendee_rsvp_counts <- 
   all_event_attendees %>% 
   filter(id != 0) %>% 
@@ -526,7 +523,27 @@ attendee_rsvp_counts <-
   summarise(count_events_rsvp = n())
 
 ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
-  geom_histogram(binwidth = 1) +
+  geom_histogram(binwidth = 1, 
+                 fill = "#88398a") +
+  labs(x = "Number of Events Attended", y = "Count") +
+  theme_rladies()
+```
+
+
+---
+
+# Loyalty
+
+```{r echo=FALSE}
+attendee_rsvp_counts <- 
+  all_event_attendees %>% 
+  filter(id != 0) %>% 
+  group_by(name, id) %>% 
+  summarise(count_events_rsvp = n())
+
+ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
+  geom_histogram(binwidth = 1, 
+                 fill = "#88398a") +
   labs(x = "Number of Events Attended", y = "Count") +
   theme_rladies()
 ```
@@ -556,7 +573,7 @@ subset(attendee_rsvp_counts,
 
 # Map of Event Locations
 
-```{r}
+```{r eval=FALSE}
 nyc <- map_data("nyc")
 
 ggplot() + 
@@ -567,10 +584,38 @@ ggplot() +
   geom_point(data = events, 
              aes(x = venue_lon, y = venue_lat), 
              alpha = 0.25, 
+             size = 3,
              color = "#88398a") +
-  coord_fixed(1) + 
-  # scale_x_continuous(limits = c(-74.15, -73.9), expand = c(0, 0)) +
-  # scale_y_continuous(limits = c(40.65, 40.9), expand = c(0, 0)) +
+  coord_cartesian(xlim = c(-74.02, -73.9), ylim = c(40.7, 40.8)) +
+  labs(x = "", y = "", title = "Event Locations") +
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "white"),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
+
+
+---
+
+# Map of Event Locations
+
+```{r echo=FALSE}
+nyc <- map_data("nyc")
+
+ggplot() + 
+  geom_polygon(data = nyc, 
+               aes(x = long, y = lat, group = group),
+               fill = "white", 
+               color = "darkgrey") + 
+  geom_point(data = events, 
+             aes(x = venue_lon, y = venue_lat), 
+             alpha = 0.25, 
+             size = 3,
+             color = "#88398a") +
+  coord_cartesian(xlim = c(-74.02, -73.9), ylim = c(40.7, 40.8)) +
   labs(x = "", y = "", title = "Event Locations") +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -673,3 +718,8 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 ---
 
 # Word Cloud - Comments
+
+```{r}
+
+```
+

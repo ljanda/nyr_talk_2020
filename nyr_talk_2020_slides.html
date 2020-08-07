@@ -13,7 +13,7 @@
 class: center, middle, inverse, title-slide
 
 # R-Ladies NYC: An Analysis
-## ⚔<br/>NYR 2020
+## <br/>NYR 2020
 ### Ludmila Janda
 ### Amplify
 ### 2020/08/14
@@ -501,12 +501,18 @@ attendee_rsvp_counts &lt;-
   summarise(count_events_rsvp = n())
 
 ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
-  geom_histogram(binwidth = 1) +
+  geom_histogram(binwidth = 1, 
+                 fill = "#88398a") +
   labs(x = "Number of Events Attended", y = "Count") +
   theme_rladies()
 ```
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+---
+
+# Loyalty
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
 
 
 ---
@@ -555,16 +561,102 @@ subset(attendee_rsvp_counts,
 
 ---
 
-Map of Event Locations
+# Map of Event Locations
+
+
+```r
+nyc &lt;- map_data("nyc")
+
+ggplot() + 
+  geom_polygon(data = nyc, 
+               aes(x = long, y = lat, group = group),
+               fill = "white", 
+               color = "darkgrey") + 
+  geom_point(data = events, 
+             aes(x = venue_lon, y = venue_lat), 
+             alpha = 0.25, 
+             size = 3,
+             color = "#88398a") +
+  coord_cartesian(xlim = c(-74.02, -73.9), ylim = c(40.7, 40.8)) +
+  labs(x = "", y = "", title = "Event Locations") +
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "white"),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
 
 
 ---
 
-Word Cloud
+# Map of Event Locations
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-37-1.png" width="800px" /&gt;
+
+```
+## Warning: Removed 5 rows containing missing values (geom_point).
+```
+
+![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+
 
 ---
+
+# Word Cloud - Event Descriptions
+
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-40-1.png" width="800px" /&gt;
+
+---
+
+# Word Cloud
+
+
+```r
+# http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
+e3 &lt;- events %&gt;% 
+  mutate(description = str_remove_all(description, "R-Ladies"),
+         description = str_remove_all(description, "R-ladies"),
+         description = str_remove_all(description, "Rladies"),
+         description = str_remove_all(description, "New York"),
+         description = str_remove_all(description, "NYC"),
+         description = str_remove_all(description, "Online event"),
+         description = str_remove_all(description, "Book Club"), 
+         description = str_remove_all(description, "book club"), 
+         description = str_remove_all(description, "Workshop"), 
+         description = str_remove_all(description, "ladies"))
+text &lt;- e3$description
+text &lt;- gsub("[[:punct:]]|[[:digit:]]", "", text)
+docs &lt;- Corpus(VectorSource(text))
+toSpace &lt;- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+# Convert the text to lower case
+docs &lt;- tm_map(docs, content_transformer(tolower))
+# Remove english common stopwords
+docs &lt;- tm_map(docs, removeWords, stopwords("english"))
+# specify your stopwords as a character vector
+docs &lt;- tm_map(docs, removeWords, c("and", "with", "the", "will", 
+                                    "event", "can", "using", 
+                                    "she", "for", "from", "not", "how", 
+                                    "please", "also", "use", "talk", "pwe", 
+                                    "want", "email", "twitter", "phd", "well", 
+                                    "columbia", "university", "kaelen", "emily", 
+                                    "erin", "elizabeth")) 
+docs &lt;- tm_map(docs, stripWhitespace)
+dtm &lt;- TermDocumentMatrix(docs)
+m &lt;- as.matrix(dtm)
+v &lt;- sort(rowSums(m),decreasing=TRUE)
+d &lt;- data.frame(word = names(v),freq=v)
+
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words = 200, random.order = FALSE, rot.per = 0.35, 
+          colors = brewer.pal(10, "Paired"))
+```
+
+---
+
+# Word Cloud - Comments
+
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
