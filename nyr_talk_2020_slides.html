@@ -31,7 +31,9 @@ class: center, middle, inverse, title-slide
 
 
 
+---
 
+# WHAT IS R-LADIES?
 
 ![R-Ladies](images/rladies_hex.png)
 ---
@@ -53,12 +55,7 @@ class: center, middle, inverse, title-slide
 
 ---
 
-WHAT IS R-LADIES?
-
-
----
-
-# Getting data from our meetup page using meetupr
+# Getting data using meetupr
 
 [meetupr](https://github.com/rladies/meetupr)
 
@@ -102,7 +99,7 @@ glimpse(events)
 
 ---
 
-# Getting data from our meetup page using meetupr
+# Getting data using meetupr
 
 
 ```r
@@ -565,20 +562,24 @@ subset(attendee_rsvp_counts,
 
 
 ```r
-nyc &lt;- map_data("nyc")
+shps &lt;- here::here("nyc")
+boroughs &lt;- st_read(shps, "nyc") %&gt;% 
+  filter(boro_name == "Manhattan" | boro_name == "Brooklyn") %&gt;% 
+  pull(geometry)
+nyc_boroughs = st_transform(boroughs, 2263)
+
+events_spatial &lt;- 
+  events %&gt;% 
+  select(latitude = venue_lat, longitude = venue_lon) %&gt;% 
+  filter(!is.na(latitude)) %&gt;% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %&gt;% 
+  st_transform(2263)
 
 ggplot() + 
-  geom_polygon(data = nyc, 
-               aes(x = long, y = lat, group = group),
-               fill = "white", 
-               color = "darkgrey") + 
-  geom_point(data = events, 
-             aes(x = venue_lon, y = venue_lat), 
-             alpha = 0.25, 
-             size = 3,
-             color = "#88398a") +
-  coord_cartesian(xlim = c(-74.02, -73.9), ylim = c(40.7, 40.8)) +
+  geom_sf(data = nyc_boroughs, fill = "white", color = "darkgrey") +
+  geom_sf(data = events_spatial, alpha = 0.25, size = 2, color = "#88398a") +  
   labs(x = "", y = "", title = "Event Locations") +
+  coord_sf() +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -594,11 +595,33 @@ ggplot() +
 # Map of Event Locations
 
 
-```
-## Warning: Removed 5 rows containing missing values (geom_point).
-```
+```r
+shps &lt;- here::here("nyc")
+boroughs &lt;- st_read(shps, "nyc") %&gt;% 
+  filter(boro_name == "Manhattan" | boro_name == "Brooklyn") %&gt;% 
+  pull(geometry)
+nyc_boroughs = st_transform(boroughs, 2263)
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+events_spatial &lt;- 
+  events %&gt;% 
+  select(latitude = venue_lat, longitude = venue_lon) %&gt;% 
+  filter(!is.na(latitude)) %&gt;% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %&gt;% 
+  st_transform(2263)
+
+ggplot() + 
+  geom_sf(data = nyc_boroughs, fill = "white", color = "darkgrey") +
+  geom_sf(data = events_spatial, alpha = 0.25, size = 2, color = "#88398a") +  
+  labs(x = "", y = "", title = "Event Locations") +
+  coord_sf() +
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "white"),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
 
 
 ---

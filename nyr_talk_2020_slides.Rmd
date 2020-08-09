@@ -30,7 +30,7 @@ library(ggrepel)
 library(tm)
 library(wordcloud)
 library(maps)
-library(nycmaps)
+library(sf)
 ```
 
 ```{r include=FALSE}
@@ -116,20 +116,7 @@ events <- get_events(urlname, "past")
 ```
 
 ```{r}
-glimpse(events)
-```
-
-
----
-
-# Getting data using meetupr
-
-```{r eval=FALSE}
-members <- get_members(urlname)
-```
-
-```{r}
-glimpse(members)
+colnames(events)
 ```
 
 
@@ -237,8 +224,6 @@ events_normal <- events %>%
 summary(events_normal$yes_rsvp_count)
 ```
 
-![R-Ladies](images/youreallylikeme.jpeg)
-
 
 ---
 
@@ -305,7 +290,7 @@ members <- get_members(urlname)
 ```
 
 ```{r}
-glimpse(members)
+colnames(members)
 ```
 
 
@@ -518,7 +503,8 @@ all_event_attendees <-
 ```{r eval=FALSE}
 attendee_rsvp_counts <- 
   all_event_attendees %>% 
-  filter(id != 0) %>% 
+  filter(id != 0, 
+         rsvp_response == "yes") %>% 
   group_by(name, id) %>% 
   summarise(count_events_rsvp = n())
 
@@ -537,7 +523,8 @@ ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
 ```{r echo=FALSE}
 attendee_rsvp_counts <- 
   all_event_attendees %>% 
-  filter(id != 0) %>% 
+  filter(id != 0, 
+         rsvp_response == "yes") %>% 
   group_by(name, id) %>% 
   summarise(count_events_rsvp = n())
 
@@ -549,20 +536,12 @@ ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
 ```
 
 
----
-
-# R-Ladies NYC Number One Fan 
-
-```{r}
-summary(attendee_rsvp_counts$count_events_rsvp)
-```
-
 
 ---
 
 # R-Ladies NYC Number One Fan 
 
-```{r}
+```{r warning=FALSE}
 subset(attendee_rsvp_counts, 
        name == "Ludmila Janda", 
        select = count_events_rsvp)
@@ -574,20 +553,31 @@ subset(attendee_rsvp_counts,
 # Map of Event Locations
 
 ```{r eval=FALSE}
-nyc <- map_data("nyc")
+shps <- here::here("nyc")
+boroughs <- st_read(shps, "nyc") %>% 
+  filter(boro_name == "Manhattan" | boro_name == "Brooklyn") %>% 
+  pull(geometry)
+nyc_boroughs = st_transform(boroughs, 2263)
 
+events_spatial <- 
+  events %>% 
+  select(latitude = venue_lat, longitude = venue_lon) %>% 
+  filter(!is.na(latitude)) %>% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>% 
+  st_transform(2263)
+```
+
+
+---
+
+# Map of Event Locations
+
+```{r eval=FALSE}
 ggplot() + 
-  geom_polygon(data = nyc, 
-               aes(x = long, y = lat, group = group),
-               fill = "white", 
-               color = "darkgrey") + 
-  geom_point(data = events, 
-             aes(x = venue_lon, y = venue_lat), 
-             alpha = 0.25, 
-             size = 3,
-             color = "#88398a") +
-  coord_cartesian(xlim = c(-74.02, -73.9), ylim = c(40.7, 40.8)) +
+  geom_sf(data = nyc_boroughs, fill = "white", color = "darkgrey") +
+  geom_sf(data = events_spatial, alpha = 0.25, size = 2, color = "#88398a") +  
   labs(x = "", y = "", title = "Event Locations") +
+  coord_sf() +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -603,20 +593,24 @@ ggplot() +
 # Map of Event Locations
 
 ```{r echo=FALSE}
-nyc <- map_data("nyc")
+shps <- here::here("nyc")
+boroughs <- st_read(shps, "nyc") %>% 
+  filter(boro_name == "Manhattan" | boro_name == "Brooklyn") %>% 
+  pull(geometry)
+nyc_boroughs = st_transform(boroughs, 2263)
+
+events_spatial <- 
+  events %>% 
+  select(latitude = venue_lat, longitude = venue_lon) %>% 
+  filter(!is.na(latitude)) %>% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>% 
+  st_transform(2263)
 
 ggplot() + 
-  geom_polygon(data = nyc, 
-               aes(x = long, y = lat, group = group),
-               fill = "white", 
-               color = "darkgrey") + 
-  geom_point(data = events, 
-             aes(x = venue_lon, y = venue_lat), 
-             alpha = 0.25, 
-             size = 3,
-             color = "#88398a") +
-  coord_cartesian(xlim = c(-74.02, -73.9), ylim = c(40.7, 40.8)) +
+  geom_sf(data = nyc_boroughs, fill = "white", color = "darkgrey") +
+  geom_sf(data = events_spatial, alpha = 0.25, size = 2, color = "#88398a") +  
   labs(x = "", y = "", title = "Event Locations") +
+  coord_sf() +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -722,4 +716,23 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 ```{r}
 
 ```
+
+
+---
+
+Further Work
+
+- flexdashboard
+
+--
+
+- automate website event posts
+
+--
+
+- consider who our speakers are/if we are involving the community 
+
+---
+
+Thank You
 
