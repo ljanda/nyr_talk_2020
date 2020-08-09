@@ -31,11 +31,17 @@ class: center, middle, inverse, title-slide
 
 
 
----
 
 # WHAT IS R-LADIES?
 
-![R-Ladies](images/rladies_hex.png)
+
+---
+
+# This talk will focus on R-Ladies NYC
+
+&lt;img src="/Users/ljanda/Documents/misc/nyr_talk_2020/images/rladies_hex.png" width="60%" /&gt;
+
+
 ---
 
 # WHAT IS THIS TALK?
@@ -50,14 +56,13 @@ class: center, middle, inverse, title-slide
 
 --
 
-- A look at the code that used to do this (and possibly using some fun functions that might be new to you)
-
+- A look at the code used to do this
 
 ---
 
 # Getting data using meetupr
 
-[meetupr](https://github.com/rladies/meetupr)
+[meetupr](https://github.com/rladies/meetupr) github link
 
 
 ```r
@@ -67,71 +72,18 @@ events &lt;- get_events(urlname, "past")
 
 
 ```r
-glimpse(events)
+colnames(events)
 ```
 
 ```
-## Observations: 47
-## Variables: 21
-## $ id              &lt;chr&gt; "235073330", "237328664", "237573729", "238954081", "…
-## $ name            &lt;chr&gt; "Launching Rladies New York!", "R-Ladies New York Lec…
-## $ created         &lt;dttm&gt; 2016-10-24 00:36:35, 2017-01-30 19:58:06, 2017-02-09…
-## $ status          &lt;chr&gt; "past", "past", "past", "past", "past", "past", "past…
-## $ time            &lt;dttm&gt; 2016-11-21 18:15:00, 2017-02-21 18:30:00, 2017-03-11…
-## $ local_date      &lt;date&gt; 2016-11-21, 2017-02-21, 2017-03-11, 2017-04-18, 2017…
-## $ local_time      &lt;chr&gt; "18:15", "18:30", "11:00", "18:30", "11:00", "14:00",…
-## $ waitlist_count  &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
-## $ yes_rsvp_count  &lt;int&gt; 57, 55, 21, 46, 26, 20, 23, 24, 57, 55, 44, 51, 42, 4…
-## $ venue_id        &lt;int&gt; 24906271, 24498435, 25038699, 25153575, 25038699, 884…
-## $ venue_name      &lt;chr&gt; "Federal Building", "Flatiron Health", "Rizzoli Books…
-## $ venue_lat       &lt;dbl&gt; 40.75000, 40.74216, 40.74000, 40.75000, 40.74000, 40.…
-## $ venue_lon       &lt;dbl&gt; -73.99000, -73.98989, -73.99000, -73.98000, -73.99000…
-## $ venue_address_1 &lt;chr&gt; "90 church street, 4th floor ", "200 5th Ave, 8th Flo…
-## $ venue_city      &lt;chr&gt; "New York ", "New York", "New York ", "New York", "Ne…
-## $ venue_state     &lt;chr&gt; "NY", "NY", "NY", "NY", "NY", "NY", NA, "NY", NA, "NY…
-## $ venue_zip       &lt;chr&gt; "10001", "", "10010", "10016", "10010", "10002", NA, …
-## $ venue_country   &lt;chr&gt; "us", "us", "us", "us", "us", "us", "US", "us", "US",…
-## $ description     &lt;chr&gt; "&lt;p&gt;Join us for the launch of New York's first R comm…
-## $ link            &lt;chr&gt; "https://www.meetup.com/rladies-newyork/events/235073…
-## $ resource        &lt;list&gt; [[1.477284e+12, 8100000, "235073330", "Launching Rla…
+##  [1] "id"              "name"            "created"         "status"         
+##  [5] "time"            "local_date"      "local_time"      "waitlist_count" 
+##  [9] "yes_rsvp_count"  "venue_id"        "venue_name"      "venue_lat"      
+## [13] "venue_lon"       "venue_address_1" "venue_city"      "venue_state"    
+## [17] "venue_zip"       "venue_country"   "description"     "link"           
+## [21] "resource"
 ```
 
-
----
-
-# Getting data using meetupr
-
-
-```r
-members &lt;- get_members(urlname)
-```
-
-
-```r
-glimpse(members)
-```
-
-```
-## Observations: 1,856
-## Variables: 12
-## $ id         &lt;int&gt; 202097213, 251470805, 198578118, 208748698, 201077483, 215…
-## $ name       &lt;chr&gt; "Emily Dodwell", "R-Ladies Global", "Gabriela Hempfling", …
-## $ bio        &lt;chr&gt; "Data Scientist in the Statistics Research Department at A…
-## $ status     &lt;chr&gt; "active", "active", "active", "active", "active", "active"…
-## $ created    &lt;dttm&gt; 2016-11-04 14:35:53, 2018-04-29 06:33:13, 2016-11-22 10:0…
-## $ city       &lt;chr&gt; "New York", "San Francisco", "New York", "New York", "New …
-## $ country    &lt;chr&gt; "us", "us", "us", "us", "us", "us", "us", "us", "us", "us"…
-## $ state      &lt;chr&gt; "NY", "CA", "NY", "NY", "NY", "NY", "NY", "NY", "NY", "NY"…
-## $ lat        &lt;dbl&gt; 40.71, 37.78, 40.73, 40.74, 40.75, 40.76, 40.83, 40.80, 40…
-## $ lon        &lt;dbl&gt; -74.01, -122.42, -73.99, -73.99, -74.00, -73.91, -73.95, -…
-## $ photo_link &lt;chr&gt; "https://secure.meetupstatic.com/photos/member/c/6/3/a/mem…
-## $ resource   &lt;list&gt; [[202097213, "Emily Dodwell", "Data Scientist in the Stat…
-```
-
-
----
-
-# Number of Events and Members
 
 
 ```r
@@ -142,15 +94,6 @@ nrow(events)
 ## [1] 47
 ```
 
-
-
-```r
-nrow(members)
-```
-
-```
-## [1] 1856
-```
 
 ---
 
@@ -185,7 +128,7 @@ ggplot(events, aes(local_date, yes_rsvp_count)) +
 
 # Are our RSVP counts trending upwards?
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-10-1.png" width="75%" /&gt;
 
 
 ---
@@ -203,8 +146,11 @@ events_low_labels &lt;- events %&gt;%
 ggplot(events_low_labels, aes(local_date, yes_rsvp_count, label = name)) + 
   geom_line(color = "#88398a") +
   geom_point(color = "#88398a", size = 2) + 
-  geom_label_repel(size = 2.5, force = 5, nudge_y = 5, segment.color = "grey60") + 
-  labs(x = "Date", y = "RSVP Count") + 
+  geom_label_repel(size = 2.5, 
+                   force = 5, 
+                   nudge_y = 5, 
+                   segment.color = "grey60") + 
+  labs(x = NULL, y = "RSVP Count") + 
   theme_rladies()
 ```
 
@@ -213,7 +159,7 @@ ggplot(events_low_labels, aes(local_date, yes_rsvp_count, label = name)) +
 
 # What are those low RSVP count events?
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-12-1.png" width="75%" /&gt;
 
 
 ---
@@ -239,8 +185,6 @@ summary(events_normal$yes_rsvp_count)
 ##   38.00   55.00   66.00   68.72   82.00  103.00
 ```
 
-![R-Ladies](images/youreallylikeme.jpeg)
-
 
 ---
 
@@ -251,7 +195,7 @@ summary(events_normal$yes_rsvp_count)
 ggplot(events_normal, aes(local_date, yes_rsvp_count)) + 
   geom_line(color = "#88398a") +
   geom_point(color = "#88398a", size = 2) + 
-  labs(x = "Date", y = "RSVP Count") + 
+  labs(x = NULL, y = "RSVP Count") + 
   theme_rladies()
 ```
 
@@ -260,7 +204,7 @@ ggplot(events_normal, aes(local_date, yes_rsvp_count)) +
 
 # Trending Up?
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-16-1.png" width="75%" /&gt;
 
 
 ---
@@ -271,10 +215,15 @@ ggplot(events_normal, aes(local_date, yes_rsvp_count)) +
 ```r
 events_normal_labels &lt;- events_normal %&gt;% 
   mutate(name = ifelse(yes_rsvp_count &lt; 80, "", name))
-ggplot(events_normal_labels, aes(local_date, yes_rsvp_count, label = name)) + 
+
+ggplot(events_normal_labels, 
+       aes(local_date, yes_rsvp_count, label = name)) + 
   geom_col(fill = "#88398a") +
-  geom_label_repel(size = 2.5, force = 5, nudge_y = -5, segment.color = "grey60") + 
-  labs(x = "Date", y = "RSVP Count") + 
+  geom_label_repel(size = 4, 
+                   force = 5, 
+                   nudge_y = -7, 
+                   segment.color = "grey60") + 
+  labs(x = NULL, y = "RSVP Count") + 
   theme_rladies()
 ```
 
@@ -283,7 +232,7 @@ ggplot(events_normal_labels, aes(local_date, yes_rsvp_count, label = name)) +
 
 # What were those "popular" events?
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-18-1.png" width="75%" /&gt;
 
 
 ---
@@ -297,30 +246,19 @@ members &lt;- get_members(urlname)
 
 
 ```r
-glimpse(members)
+table(members$status)
 ```
 
 ```
-## Observations: 1,856
-## Variables: 12
-## $ id         &lt;int&gt; 202097213, 251470805, 198578118, 208748698, 201077483, 215…
-## $ name       &lt;chr&gt; "Emily Dodwell", "R-Ladies Global", "Gabriela Hempfling", …
-## $ bio        &lt;chr&gt; "Data Scientist in the Statistics Research Department at A…
-## $ status     &lt;chr&gt; "active", "active", "active", "active", "active", "active"…
-## $ created    &lt;dttm&gt; 2016-11-04 14:35:53, 2018-04-29 06:33:13, 2016-11-22 10:0…
-## $ city       &lt;chr&gt; "New York", "San Francisco", "New York", "New York", "New …
-## $ country    &lt;chr&gt; "us", "us", "us", "us", "us", "us", "us", "us", "us", "us"…
-## $ state      &lt;chr&gt; "NY", "CA", "NY", "NY", "NY", "NY", "NY", "NY", "NY", "NY"…
-## $ lat        &lt;dbl&gt; 40.71, 37.78, 40.73, 40.74, 40.75, 40.76, 40.83, 40.80, 40…
-## $ lon        &lt;dbl&gt; -74.01, -122.42, -73.99, -73.99, -74.00, -73.91, -73.95, -…
-## $ photo_link &lt;chr&gt; "https://secure.meetupstatic.com/photos/member/c/6/3/a/mem…
-## $ resource   &lt;list&gt; [[202097213, "Emily Dodwell", "Data Scientist in the Stat…
+## 
+## active 
+##   1856
 ```
 
 
 ---
 
-Count of new members by month
+# Count of new members by month
 
 
 ```r
@@ -330,31 +268,33 @@ members_month &lt;- members %&gt;%
   summarise(count_new_members = n()) 
 
 ggplot(members_month, aes(year_month, count_new_members)) + 
-  geom_col() + 
+  geom_col(fill = "#88398a") + 
   scale_x_date(date_breaks = '6 months', date_labels = '%Y-%m') +
+  labs(x = NULL, y = "Number of New Members") +
   theme_rladies() 
 ```
 
 
 ---
 
-Count of new members by month
+# Count of new members by month
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-22-1.png" width="75%" /&gt;
 
 
 ---
 
-# Get new members by nearest upcoming event
+# New members by nearest upcoming event
  
 
 ```r
-# group by day and get count of new accounts 
+# group by day and get count of new accounts
+# use complete() to get all the days
 new_members &lt;- members %&gt;% 
   mutate(date = as.Date(created)) %&gt;% 
   group_by(date) %&gt;% 
   summarise(count_new_members = n()) %&gt;% 
-  complete(date = seq.Date(min(date), max(date), by = "day")) # get all the days
+  complete(date = seq.Date(min(date), max(date), by = "day")) 
 
 # make event dataset to merge with
 events_dates &lt;- events %&gt;% 
@@ -364,12 +304,14 @@ events_dates &lt;- events %&gt;%
 
 ---
 
+# New members by nearest upcoming event
+
 
 ```r
 # merge members with complete dates and events 
 # get counts by event
-# include day of event in the group prior to the event
-members_events_count &lt;- left_join(new_members, events_dates, by = "date") %&gt;%
+members_events_count &lt;- 
+  left_join(new_members, events_dates, by = "date") %&gt;%
   mutate(event_flag = ifelse(!is.na(name), 1, 0), 
          event_group = cumsum(event_flag) - event_flag) %&gt;% 
   group_by(event_group) %&gt;% 
@@ -377,83 +319,33 @@ members_events_count &lt;- left_join(new_members, events_dates, by = "date") %&g
 
 # merge members with complete dates and events 
 # get event dates for event groups
-members_events_groups &lt;- left_join(new_members, events_dates, by = "date") %&gt;% 
+members_events_groups &lt;- 
+  left_join(new_members, events_dates, by = "date") %&gt;% 
   mutate(event_flag = ifelse(!is.na(name), 1, 0), 
          event_group = cumsum(event_flag) - event_flag) %&gt;% 
   filter(!is.na(name)) %&gt;% 
   distinct(event_group, name, date)
 
-members_events &lt;- left_join(members_events_groups, 
-                            members_events_count, by = "event_group") %&gt;% 
+# final join
+members_events &lt;- 
+  left_join(members_events_groups, members_events_count, 
+            by = "event_group") %&gt;% 
   mutate(name = ifelse(new_members &lt; 50, "", name))
 ```
 
 
 ---
 
-# New members by Nearest Upcoming Event
+# New members by nearest upcoming event
 
 
 ```r
 ggplot(members_events, aes(date, new_members, label = name)) + 
   geom_col() + 
-  geom_label_repel(size = 2.5, force = 5, nudge_y = 10, segment.color = "grey60") + 
-  labs(x = NULL, y = "New Member Count", 
-       title = "Count of New Members Prior to Each Event") +
-  theme_rladies() 
-```
-
-
----
-
-# New members by Nearest Upcoming Event
-
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
-
-
----
-
-# Hadley Wickham Bump?
-
-
-```r
-members_events &lt;- left_join(members_events_groups, 
-                            members_events_count, by = "event_group") %&gt;% 
-  mutate(name = 
-           ifelse(name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
-                  name, ""))
-
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
-  geom_label_repel(size = 2.5, force = 5, nudge_y = 10, segment.color = "grey60") + 
-  labs(x = NULL, y = "New Member Count", 
-       title = "Count of New Members Prior to Each Event") +
-  theme_rladies() 
-```
-
-
----
-
-# Hadley Wickham Bump?
-
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
-
-
----
-
-# Member counts with events 
-
-
-```r
-members_events_all_days &lt;- left_join(new_members, events_dates, by = "date") %&gt;% 
-  mutate(event_flag = factor(ifelse(!is.na(name), 1, 0)), 
-         count_new_members = ifelse(is.na(count_new_members), 0, count_new_members), 
-         year = year(date))
-
-ggplot(members_events_all_days, aes(date, count_new_members, fill = event_flag)) + 
-  geom_col() + 
-  facet_wrap(~year, scales = "free") +
-  scale_fill_manual(values = c("#D3D3D3", "#88398a")) +
+  geom_label_repel(size = 4, 
+                   force = 7, 
+                   nudge_y = 10, 
+                   segment.color = "grey60") + 
   labs(x = NULL, y = "New Member Count") +
   theme_rladies() 
 ```
@@ -461,9 +353,70 @@ ggplot(members_events_all_days, aes(date, count_new_members, fill = event_flag))
 
 ---
 
+# New members by nearest upcoming event
+
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-26-1.png" width="75%" /&gt;
+
+
+---
+
+# Hadley Wickham Bump?
+
+
+```r
+members_events &lt;- left_join(members_events_groups, 
+                            members_events_count, 
+                            by = "event_group") %&gt;% 
+  mutate(name = ifelse(
+    name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
+    name, ""))
+
+ggplot(members_events, aes(date, new_members, label = name)) + 
+  geom_col() + 
+  geom_label_repel(size = 4, 
+                   force = 7, 
+                   nudge_y = 10, 
+                   segment.color = "grey60") + 
+  labs(x = NULL, y = "New Member Count") +
+  theme_rladies() 
+```
+
+
+---
+
+# Hadley Wickham Bump?
+
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-28-1.png" width="75%" /&gt;
+
+
+---
+
 # Member counts with events 
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
+```r
+members_events_all_days &lt;- 
+  left_join(new_members, events_dates, by = "date") %&gt;% 
+  mutate(event_flag = factor(ifelse(!is.na(name), "Yes", "No")), 
+         count_new_members = 
+           ifelse(is.na(count_new_members), 0, count_new_members), 
+         year = year(date))
+
+ggplot(members_events_all_days, 
+       aes(date, count_new_members, fill = event_flag)) + 
+  geom_col() + 
+  #facet_wrap(~year, scales = "free") +
+  scale_fill_manual(values = c("#D3D3D3", "#88398a")) +
+  labs(x = NULL, y = "New Member Count", fill = "Event Day") +
+  theme_rladies() 
+```
+
+
+---
+
+# Member counts with events 
+
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-30-1.png" width="75%" /&gt;
 
 
 ---
@@ -493,9 +446,12 @@ all_event_attendees &lt;-
 ```r
 attendee_rsvp_counts &lt;- 
   all_event_attendees %&gt;% 
-  filter(id != 0) %&gt;% 
-  group_by(name, id) %&gt;% 
-  summarise(count_events_rsvp = n())
+  filter(id != 0, 
+         rsvp_response == "yes") %&gt;% 
+  group_by(id) %&gt;% 
+  summarise(count_events_rsvp = n()) %&gt;% 
+  left_join(members, by = "id") %&gt;% 
+  filter(created &lt; "2020-01-01")
 
 ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
   geom_histogram(binwidth = 1, 
@@ -509,22 +465,8 @@ ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
 
 # Loyalty
 
-![](nyr_talk_2020_slides_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-33-1.png" width="75%" /&gt;
 
-
----
-
-# R-Ladies NYC Number One Fan 
-
-
-```r
-summary(attendee_rsvp_counts$count_events_rsvp)
-```
-
-```
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   1.000   1.000   1.000   3.079   3.000  41.000
-```
 
 
 ---
@@ -534,25 +476,15 @@ summary(attendee_rsvp_counts$count_events_rsvp)
 
 ```r
 subset(attendee_rsvp_counts, 
-       name == "Ludmila Janda", 
+       id == 103401142, 
        select = count_events_rsvp)
-```
-
-```
-## Warning: `...` is not empty.
-## 
-## We detected these problematic arguments:
-## * `needs_dots`
-## 
-## These dots only exist to allow future extensions and should be empty.
-## Did you misspecify an argument?
 ```
 
 ```
 ## # A tibble: 1 x 1
 ##   count_events_rsvp
 ##               &lt;int&gt;
-## 1                41
+## 1                40
 ```
 
 
@@ -566,6 +498,19 @@ shps &lt;- here::here("nyc")
 boroughs &lt;- st_read(shps, "nyc") %&gt;% 
   filter(boro_name == "Manhattan" | boro_name == "Brooklyn") %&gt;% 
   pull(geometry)
+```
+
+```
+## Reading layer `nyc' from data source `/Users/ljanda/Documents/misc/nyr_talk_2020/nyc' using driver `ESRI Shapefile'
+## Simple feature collection with 4 features and 4 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -74.04773 ymin: 40.54183 xmax: -73.70001 ymax: 40.91553
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+```
+
+```r
 nyc_boroughs = st_transform(boroughs, 2263)
 
 events_spatial &lt;- 
@@ -574,11 +519,20 @@ events_spatial &lt;-
   filter(!is.na(latitude)) %&gt;% 
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %&gt;% 
   st_transform(2263)
+```
 
+
+---
+
+# Map of Event Locations
+
+
+```r
 ggplot() + 
   geom_sf(data = nyc_boroughs, fill = "white", color = "darkgrey") +
-  geom_sf(data = events_spatial, alpha = 0.25, size = 2, color = "#88398a") +  
-  labs(x = "", y = "", title = "Event Locations") +
+  geom_sf(data = events_spatial, 
+          alpha = 0.25, size = 2, color = "#88398a") +  
+  labs(x = "", y = "") +
   coord_sf() +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -594,45 +548,12 @@ ggplot() +
 
 # Map of Event Locations
 
-
-```r
-shps &lt;- here::here("nyc")
-boroughs &lt;- st_read(shps, "nyc") %&gt;% 
-  filter(boro_name == "Manhattan" | boro_name == "Brooklyn") %&gt;% 
-  pull(geometry)
-nyc_boroughs = st_transform(boroughs, 2263)
-
-events_spatial &lt;- 
-  events %&gt;% 
-  select(latitude = venue_lat, longitude = venue_lon) %&gt;% 
-  filter(!is.na(latitude)) %&gt;% 
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %&gt;% 
-  st_transform(2263)
-
-ggplot() + 
-  geom_sf(data = nyc_boroughs, fill = "white", color = "darkgrey") +
-  geom_sf(data = events_spatial, alpha = 0.25, size = 2, color = "#88398a") +  
-  labs(x = "", y = "", title = "Event Locations") +
-  coord_sf() +
-  theme(panel.border = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(colour = "white"),
-        axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank())
-```
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-37-1.png" width="1000%" /&gt;
 
 
 ---
 
 # Word Cloud - Event Descriptions
-
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-40-1.png" width="800px" /&gt;
-
----
-
-# Word Cloud
 
 
 ```r
@@ -677,9 +598,34 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 
 ---
 
+# Word Cloud
+
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-39-1.png" width="75%" /&gt;
+
+---
+
 # Word Cloud - Comments
 
 
+
+
+---
+
+Further Work
+
+- flexdashboard
+
+--
+
+- automate website event posts
+
+--
+
+- consider who our speakers are/if we are involving the community 
+
+---
+
+Thank You
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
