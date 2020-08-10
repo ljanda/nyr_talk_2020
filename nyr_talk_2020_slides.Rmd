@@ -734,7 +734,58 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 # Word Cloud - Comments
 
 ```{r}
+event_ids <- 
+  events %>% 
+  filter(id != "271374747", 
+         id != "270953432", 
+         id != "265160892", 
+         id != "263376046", 
+         id != "257130300", 
+         id != "256736860", 
+         id != "251676940", 
+         id != "249296205", 
+         id != "247926543", 
+         id != "242382626", 
+         id != "242371329", 
+         id != "241262100", 
+         id != "239047532") 
 
+event_ids <- event_ids$id
+
+# get comments for all the events
+all_event_comments <- 
+  event_ids %>% 
+  map_dfr(slowly(~(get_event_comments(urlname, event_id = .)))) 
+
+```
+
+```{r, echo=FALSE, warning=FALSE, out.width="75%"}
+# http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
+
+text <- all_event_comments$comment
+text <- gsub("[[:punct:]]|[[:digit:]]", "", text)
+docs <- Corpus(VectorSource(text))
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+# Convert the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Remove english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# specify your stopwords as a character vector
+docs <- tm_map(docs, removeWords, c("can", "soumya", "joyce", "event", 
+                                    "will", "make", "just", "see",
+                                    "hope", "need", "also", "ill",
+                                    "didnt", "dont", "ids",
+                                    "hello", "hi", "hey", 
+                                    "everyone", "someone", "meetup")) 
+docs <- tm_map(docs, stripWhitespace)
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words = 200, random.order = FALSE, rot.per = 0.35, 
+          colors = brewer.pal(5, "BuPu"))
 ```
 
 
