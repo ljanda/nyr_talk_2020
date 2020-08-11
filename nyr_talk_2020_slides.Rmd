@@ -47,6 +47,7 @@ library(sf)
 events <- read_rds(here::here("data/events.rds"))
 members <- read_rds(here::here("data/members.rds"))
 all_event_attendees <- read_rds(here::here("data/all_event_attendees.rds"))
+all_event_comments <- read_rds(here::here("data/all_event_comments.rds"))
 ```
 
 
@@ -87,6 +88,11 @@ theme_rladies <- function () {
 
 # WHAT IS R-LADIES?
 
+[R-Ladies Global](https://benubah.github.io/r-community-explorer/rladies.html)
+
+```{r echo=FALSE, out.width="60%"}
+include_graphics(here::here("images/rladies_global.png"))
+```
 
 ---
 
@@ -689,7 +695,7 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 
 # Word Cloud
 
-```{r, echo=FALSE, warning=FALSE, out.width="75%"}
+```{r, echo=FALSE, warning=FALSE, out.width="100%"}
 # http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
 e3 <- events %>% 
   mutate(description = str_remove_all(description, "R-Ladies"),
@@ -705,7 +711,6 @@ e3 <- events %>%
 text <- e3$description
 text <- gsub("[[:punct:]]|[[:digit:]]", "", text)
 docs <- Corpus(VectorSource(text))
-toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
 # Convert the text to lower case
 docs <- tm_map(docs, content_transformer(tolower))
 # Remove english common stopwords
@@ -733,7 +738,7 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 
 # Word Cloud - Comments
 
-```{r}
+```{r eval=FALSE, echo=FALSE, warning=FALSE}
 event_ids <- 
   events %>% 
   filter(id != "271374747", 
@@ -757,25 +762,25 @@ all_event_comments <-
   event_ids %>% 
   map_dfr(slowly(~(get_event_comments(urlname, event_id = .)))) 
 
+
 ```
 
-```{r, echo=FALSE, warning=FALSE, out.width="75%"}
+```{r, echo=FALSE, warning=FALSE, out.width="100%"}
 # http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
 
 text <- all_event_comments$comment
 text <- gsub("[[:punct:]]|[[:digit:]]", "", text)
 docs <- Corpus(VectorSource(text))
-toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
 # Convert the text to lower case
 docs <- tm_map(docs, content_transformer(tolower))
 # Remove english common stopwords
 docs <- tm_map(docs, removeWords, stopwords("english"))
-# specify your stopwords as a character vector
+# specify stopwords as a character vector
 docs <- tm_map(docs, removeWords, c("can", "soumya", "joyce", "event", 
                                     "will", "make", "just", "see",
                                     "hope", "need", "also", "ill",
-                                    "didnt", "dont", "ids",
-                                    "hello", "hi", "hey", 
+                                    "didnt", "dont", "ids", "youre",
+                                    "hello", "hi", "hey", "wont", "guys",
                                     "everyone", "someone", "meetup")) 
 docs <- tm_map(docs, stripWhitespace)
 dtm <- TermDocumentMatrix(docs)
