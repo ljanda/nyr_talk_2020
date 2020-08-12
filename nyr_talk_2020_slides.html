@@ -34,6 +34,9 @@ class: center, middle, inverse, title-slide
 
 # WHAT IS R-LADIES?
 
+[R-Ladies Global](https://benubah.github.io/r-community-explorer/rladies.html)
+
+&lt;img src="/Users/ljanda/Documents/misc/nyr_talk_2020/images/rladies_global.png" width="100%" /&gt;
 
 ---
 
@@ -76,11 +79,10 @@ colnames(events)
 ```
 
 ```
-##  [1] "id"              "name"            "created"         "status"         
-##  [5] "time"            "local_date"      "local_time"      "waitlist_count" 
-##  [9] "yes_rsvp_count"  "venue_id"        "venue_name"      "venue_lat"      
-## [13] "venue_lon"       "venue_address_1" "venue_city"      "venue_state"    
-## [17] "venue_zip"       "venue_country"   "description"     "link"           
+##  [1] "id"              "name"            "created"         "status"          "time"           
+##  [6] "local_date"      "local_time"      "waitlist_count"  "yes_rsvp_count"  "venue_id"       
+## [11] "venue_name"      "venue_lat"       "venue_lon"       "venue_address_1" "venue_city"     
+## [16] "venue_state"     "venue_zip"       "venue_country"   "description"     "link"           
 ## [21] "resource"
 ```
 
@@ -128,7 +130,7 @@ ggplot(events, aes(local_date, yes_rsvp_count)) +
 
 # Are our RSVP counts trending upwards?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-10-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-12-1.png" width="75%" /&gt;
 
 
 ---
@@ -143,7 +145,8 @@ events_low_labels &lt;- events %&gt;%
          name = str_remove(name, "R-Ladies"),
          name = str_remove(name, "R Ladies"))
 
-ggplot(events_low_labels, aes(local_date, yes_rsvp_count, label = name)) + 
+ggplot(events_low_labels, 
+       aes(local_date, yes_rsvp_count, label = name)) + 
   geom_line(color = "#88398a") +
   geom_point(color = "#88398a", size = 2) + 
   geom_label_repel(size = 2.5, 
@@ -159,7 +162,7 @@ ggplot(events_low_labels, aes(local_date, yes_rsvp_count, label = name)) +
 
 # What are those low RSVP count events?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-12-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-14-1.png" width="75%" /&gt;
 
 
 ---
@@ -204,7 +207,7 @@ ggplot(events_normal, aes(local_date, yes_rsvp_count)) +
 
 # Trending Up?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-16-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-18-1.png" width="75%" /&gt;
 
 
 ---
@@ -232,7 +235,7 @@ ggplot(events_normal_labels,
 
 # What were those "popular" events?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-18-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-20-1.png" width="75%" /&gt;
 
 
 ---
@@ -279,7 +282,7 @@ ggplot(members_month, aes(year_month, count_new_members)) +
 
 # Count of new members by month
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-22-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-24-1.png" width="75%" /&gt;
 
 
 ---
@@ -340,11 +343,14 @@ members_events &lt;-
 
 
 ```r
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
+members_events %&gt;% 
+  mutate(name = 
+           str_remove(name, "R-Ladies New York Lecture Series: ")) %&gt;% 
+  ggplot(aes(date, new_members, label = name)) + 
+  geom_col(color = "black") + 
   geom_label_repel(size = 4, 
-                   force = 7, 
-                   nudge_y = 10, 
+                   force = 40, 
+                   nudge_y = 40, 
                    segment.color = "grey60") + 
   labs(x = NULL, y = "New Member Count") +
   theme_rladies() 
@@ -355,7 +361,7 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 
 # New members by nearest upcoming event
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-26-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-28-1.png" width="75%" /&gt;
 
 
 ---
@@ -367,12 +373,13 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 members_events &lt;- left_join(members_events_groups, 
                             members_events_count, 
                             by = "event_group") %&gt;% 
-  mutate(name = ifelse(
-    name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
-    name, ""))
+  mutate(name = 
+           ifelse(str_detect(name, "Tidy evaluation"), 
+                  name, ""))
 
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
+ggplot(members_events, 
+       aes(date, new_members, label = name)) + 
+  geom_col(color = "black") + 
   geom_label_repel(size = 4, 
                    force = 7, 
                    nudge_y = 10, 
@@ -386,7 +393,7 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 
 # Hadley Wickham Bump?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-28-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-30-1.png" width="75%" /&gt;
 
 
 ---
@@ -397,17 +404,23 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 ```r
 members_events_all_days &lt;- 
   left_join(new_members, events_dates, by = "date") %&gt;% 
-  mutate(event_flag = factor(ifelse(!is.na(name), "Yes", "No")), 
+  mutate(event_flag = 
+           factor(ifelse(!is.na(name), "Yes", "No")), 
          count_new_members = 
-           ifelse(is.na(count_new_members), 0, count_new_members), 
+           ifelse(is.na(count_new_members), 0, 
+                  count_new_members), 
          year = year(date))
 
 ggplot(members_events_all_days, 
-       aes(date, count_new_members, fill = event_flag)) + 
+       aes(date, count_new_members, 
+           fill = event_flag, color = event_flag)) + 
   geom_col() + 
-  #facet_wrap(~year, scales = "free") +
+  facet_wrap(~year, scales = "free") +
   scale_fill_manual(values = c("#D3D3D3", "#88398a")) +
-  labs(x = NULL, y = "New Member Count", fill = "Event Day") +
+  scale_color_manual(values = c("#D3D3D3", "#88398a"), guide = FALSE) +
+  scale_x_date(date_breaks = "2 months", date_labels = "%m") +
+  labs(x = "Month", y = "New Member Count", 
+       fill = "Event Day") +
   theme_rladies() 
 ```
 
@@ -416,7 +429,7 @@ ggplot(members_events_all_days,
 
 # Member counts with events 
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-30-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-32-1.png" width="75%" /&gt;
 
 
 ---
@@ -465,7 +478,7 @@ ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
 
 # Loyalty
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-33-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-35-1.png" width="75%" /&gt;
 
 
 
@@ -534,6 +547,7 @@ ggplot() +
           alpha = 0.25, size = 2, color = "#88398a") +  
   labs(x = "", y = "") +
   coord_sf() +
+  theme_minimal() +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -545,62 +559,22 @@ ggplot() +
 
 
 ---
+background-image: url("images/event_locations.png")
+background-size: 125%
+background-position: center top
 
-# Map of Event Locations
+# Event Locations
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-37-1.png" width="200%" /&gt;
+
 
 
 ---
+
+class: top
 
 # Word Cloud - Event Descriptions
 
-
-```r
-# http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
-e3 &lt;- events %&gt;% 
-  mutate(description = str_remove_all(description, "R-Ladies"),
-         description = str_remove_all(description, "R-ladies"),
-         description = str_remove_all(description, "Rladies"),
-         description = str_remove_all(description, "New York"),
-         description = str_remove_all(description, "NYC"),
-         description = str_remove_all(description, "Online event"),
-         description = str_remove_all(description, "Book Club"), 
-         description = str_remove_all(description, "book club"), 
-         description = str_remove_all(description, "Workshop"), 
-         description = str_remove_all(description, "ladies"))
-text &lt;- e3$description
-text &lt;- gsub("[[:punct:]]|[[:digit:]]", "", text)
-docs &lt;- Corpus(VectorSource(text))
-toSpace &lt;- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
-# Convert the text to lower case
-docs &lt;- tm_map(docs, content_transformer(tolower))
-# Remove english common stopwords
-docs &lt;- tm_map(docs, removeWords, stopwords("english"))
-# specify your stopwords as a character vector
-docs &lt;- tm_map(docs, removeWords, c("and", "with", "the", "will", 
-                                    "event", "can", "using", 
-                                    "she", "for", "from", "not", "how", 
-                                    "please", "also", "use", "talk", "pwe", 
-                                    "want", "email", "twitter", "phd", "well", 
-                                    "columbia", "university", "kaelen", "emily", 
-                                    "erin", "elizabeth")) 
-docs &lt;- tm_map(docs, stripWhitespace)
-dtm &lt;- TermDocumentMatrix(docs)
-m &lt;- as.matrix(dtm)
-v &lt;- sort(rowSums(m),decreasing=TRUE)
-d &lt;- data.frame(word = names(v),freq=v)
-
-wordcloud(words = d$word, freq = d$freq, min.freq = 1,
-          max.words = 200, random.order = FALSE, rot.per = 0.35, 
-          colors = brewer.pal(10, "Paired"))
-```
-
----
-
-# Word Cloud
-
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-39-1.png" width="100%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-40-1.png" width="85%" /&gt;
 
 ---
 
@@ -608,12 +582,12 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 
 
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-41-1.png" width="100%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-42-1.png" width="85%" /&gt;
 
 
 ---
 
-Further Work
+# Further Work
 
 - flexdashboard
 
@@ -625,10 +599,25 @@ Further Work
 
 - consider who our speakers are/if we are involving the community 
 
+--
+
 ---
 
-Thank You
+# Thank You
 
+- Sebastian Teran Hidalgo
+
+--
+
+- Laura Janda
+
+--
+
+- Samuel Crane
+
+--
+
+- R-Ladies NYC!!! 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

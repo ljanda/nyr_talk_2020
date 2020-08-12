@@ -90,7 +90,7 @@ theme_rladies <- function () {
 
 [R-Ladies Global](https://benubah.github.io/r-community-explorer/rladies.html)
 
-```{r echo=FALSE, out.width="60%"}
+```{r echo=FALSE, out.width="100%"}
 include_graphics(here::here("images/rladies_global.png"))
 ```
 
@@ -186,7 +186,8 @@ events_low_labels <- events %>%
          name = str_remove(name, "R-Ladies"),
          name = str_remove(name, "R Ladies"))
 
-ggplot(events_low_labels, aes(local_date, yes_rsvp_count, label = name)) + 
+ggplot(events_low_labels, 
+       aes(local_date, yes_rsvp_count, label = name)) + 
   geom_line(color = "#88398a") +
   geom_point(color = "#88398a", size = 2) + 
   geom_label_repel(size = 2.5, 
@@ -405,11 +406,14 @@ members_events <-
 # New members by nearest upcoming event
 
 ```{r eval=FALSE}
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
+members_events %>% 
+  mutate(name = 
+           str_remove(name, "R-Ladies New York Lecture Series: ")) %>% 
+  ggplot(aes(date, new_members, label = name)) + 
+  geom_col(color = "black") + 
   geom_label_repel(size = 4, 
-                   force = 7, 
-                   nudge_y = 10, 
+                   force = 40, 
+                   nudge_y = 40, 
                    segment.color = "grey60") + 
   labs(x = NULL, y = "New Member Count") +
   theme_rladies() 
@@ -421,11 +425,16 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 # New members by nearest upcoming event
 
 ```{r echo=FALSE, out.width="75%"}
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
-  geom_label_repel(size = 4, force = 7, nudge_y = 10, segment.color = "grey60") + 
+members_events %>% 
+  mutate(name = str_remove(name, "R-Ladies New York Lecture Series: ")) %>% 
+  ggplot(aes(date, new_members, label = name)) + 
+  geom_col(color = "black") + 
+  geom_label_repel(size = 4, 
+                   force = 40, 
+                   nudge_y = 40, 
+                   segment.color = "grey60") + 
   labs(x = NULL, y = "New Member Count") +
-  theme_rladies() 
+  theme_rladies()
 ```
 
 
@@ -437,12 +446,13 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 members_events <- left_join(members_events_groups, 
                             members_events_count, 
                             by = "event_group") %>% 
-  mutate(name = ifelse(
-    name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
-    name, ""))
+  mutate(name = 
+           ifelse(str_detect(name, "Tidy evaluation"), 
+                  name, ""))
 
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
+ggplot(members_events, 
+       aes(date, new_members, label = name)) + 
+  geom_col(color = "black") + 
   geom_label_repel(size = 4, 
                    force = 7, 
                    nudge_y = 10, 
@@ -458,14 +468,19 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 
 ```{r echo=FALSE, out.width="75%"}
 members_events <- left_join(members_events_groups, 
-                            members_events_count, by = "event_group") %>% 
+                            members_events_count, 
+                            by = "event_group") %>% 
   mutate(name = 
-           ifelse(name == "Tidy evaluation: Programming with ggplot2 and dplyr", 
+           ifelse(str_detect(name, "Tidy evaluation"), 
                   name, ""))
 
-ggplot(members_events, aes(date, new_members, label = name)) + 
-  geom_col() + 
-  geom_label_repel(size = 4, force = 7, nudge_y = 10, segment.color = "grey60") + 
+ggplot(members_events, 
+       aes(date, new_members, label = name)) + 
+  geom_col(color = "black") + 
+  geom_label_repel(size = 4, 
+                   force = 7, 
+                   nudge_y = 10, 
+                   segment.color = "grey60") + 
   labs(x = NULL, y = "New Member Count") +
   theme_rladies() 
 ```
@@ -478,17 +493,23 @@ ggplot(members_events, aes(date, new_members, label = name)) +
 ```{r eval=FALSE}
 members_events_all_days <- 
   left_join(new_members, events_dates, by = "date") %>% 
-  mutate(event_flag = factor(ifelse(!is.na(name), "Yes", "No")), 
+  mutate(event_flag = 
+           factor(ifelse(!is.na(name), "Yes", "No")), 
          count_new_members = 
-           ifelse(is.na(count_new_members), 0, count_new_members), 
+           ifelse(is.na(count_new_members), 0, 
+                  count_new_members), 
          year = year(date))
 
 ggplot(members_events_all_days, 
-       aes(date, count_new_members, fill = event_flag)) + 
+       aes(date, count_new_members, 
+           fill = event_flag, color = event_flag)) + 
   geom_col() + 
-  #facet_wrap(~year, scales = "free") +
+  facet_wrap(~year, scales = "free") +
   scale_fill_manual(values = c("#D3D3D3", "#88398a")) +
-  labs(x = NULL, y = "New Member Count", fill = "Event Day") +
+  scale_color_manual(values = c("#D3D3D3", "#88398a"), guide = FALSE) +
+  scale_x_date(date_breaks = "2 months", date_labels = "%m") +
+  labs(x = "Month", y = "New Member Count", 
+       fill = "Event Day") +
   theme_rladies() 
 ```
 
@@ -498,16 +519,25 @@ ggplot(members_events_all_days,
 # Member counts with events 
 
 ```{r echo=FALSE, out.width="75%"}
-members_events_all_days <- left_join(new_members, events_dates, by = "date") %>% 
-  mutate(event_flag = factor(ifelse(!is.na(name), "Yes", "No")), 
-         count_new_members = ifelse(is.na(count_new_members), 0, count_new_members), 
+members_events_all_days <- 
+  left_join(new_members, events_dates, by = "date") %>% 
+  mutate(event_flag = 
+           factor(ifelse(!is.na(name), "Yes", "No")), 
+         count_new_members = 
+           ifelse(is.na(count_new_members), 0, 
+                  count_new_members), 
          year = year(date))
 
-ggplot(members_events_all_days, aes(date, count_new_members, fill = event_flag)) + 
+ggplot(members_events_all_days, 
+       aes(date, count_new_members, 
+           fill = event_flag, color = event_flag)) + 
   geom_col() + 
-  #facet_wrap(~year, scales = "free") +
+  facet_wrap(~year, scales = "free") +
   scale_fill_manual(values = c("#D3D3D3", "#88398a")) +
-  labs(x = NULL, y = "New Member Count", fill = "Event Day") +
+  scale_color_manual(values = c("#D3D3D3", "#88398a"), guide = FALSE) +
+  scale_x_date(date_breaks = "2 months", date_labels = "%m") +
+  labs(x = "Month", y = "New Member Count", 
+       fill = "Event Day") +
   theme_rladies() 
 ```
 
@@ -617,6 +647,7 @@ ggplot() +
           alpha = 0.25, size = 2, color = "#88398a") +  
   labs(x = "", y = "") +
   coord_sf() +
+  theme_minimal() +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -628,15 +659,20 @@ ggplot() +
 
 
 ---
+background-image: url("images/event_locations.png")
+background-size: 125%
+background-position: center top
 
-# Map of Event Locations
+# Event Locations
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, out.width="200%"}
-ggplot() + 
+```{r eval=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+event_locations <- 
+  ggplot() + 
   geom_sf(data = nyc_boroughs, fill = "white", color = "darkgrey") +
   geom_sf(data = events_spatial, alpha = 0.25, size = 2, color = "#88398a") +  
   labs(x = "", y = "") +
   coord_sf() +
+  theme_minimal() +
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -644,58 +680,18 @@ ggplot() +
         axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank())
+
+ggsave("images/event_locations.png", event_locations)
 ```
 
 
 ---
+
+class: top
 
 # Word Cloud - Event Descriptions
 
-```{r eval=FALSE, warning=FALSE, out.width='800px'}
-# http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
-e3 <- events %>% 
-  mutate(description = str_remove_all(description, "R-Ladies"),
-         description = str_remove_all(description, "R-ladies"),
-         description = str_remove_all(description, "Rladies"),
-         description = str_remove_all(description, "New York"),
-         description = str_remove_all(description, "NYC"),
-         description = str_remove_all(description, "Online event"),
-         description = str_remove_all(description, "Book Club"), 
-         description = str_remove_all(description, "book club"), 
-         description = str_remove_all(description, "Workshop"), 
-         description = str_remove_all(description, "ladies"))
-text <- e3$description
-text <- gsub("[[:punct:]]|[[:digit:]]", "", text)
-docs <- Corpus(VectorSource(text))
-toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
-# Convert the text to lower case
-docs <- tm_map(docs, content_transformer(tolower))
-# Remove english common stopwords
-docs <- tm_map(docs, removeWords, stopwords("english"))
-# specify your stopwords as a character vector
-docs <- tm_map(docs, removeWords, c("and", "with", "the", "will", 
-                                    "event", "can", "using", 
-                                    "she", "for", "from", "not", "how", 
-                                    "please", "also", "use", "talk", "pwe", 
-                                    "want", "email", "twitter", "phd", "well", 
-                                    "columbia", "university", "kaelen", "emily", 
-                                    "erin", "elizabeth")) 
-docs <- tm_map(docs, stripWhitespace)
-dtm <- TermDocumentMatrix(docs)
-m <- as.matrix(dtm)
-v <- sort(rowSums(m),decreasing=TRUE)
-d <- data.frame(word = names(v),freq=v)
-
-wordcloud(words = d$word, freq = d$freq, min.freq = 1,
-          max.words = 200, random.order = FALSE, rot.per = 0.35, 
-          colors = brewer.pal(10, "Paired"))
-```
-
----
-
-# Word Cloud
-
-```{r, echo=FALSE, warning=FALSE, out.width="100%"}
+```{r, echo=FALSE, warning=FALSE, out.width="85%"}
 # http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
 e3 <- events %>% 
   mutate(description = str_remove_all(description, "R-Ladies"),
@@ -732,6 +728,7 @@ d <- data.frame(word = names(v),freq=v)
 wordcloud(words = d$word, freq = d$freq, min.freq = 1,
           max.words = 200, random.order = FALSE, rot.per = 0.35, 
           colors = brewer.pal(10, "Paired"))
+
 ```
 
 ---
@@ -765,7 +762,7 @@ all_event_comments <-
 
 ```
 
-```{r, echo=FALSE, warning=FALSE, out.width="100%"}
+```{r, echo=FALSE, warning=FALSE, out.width="85%"}
 # http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
 
 text <- all_event_comments$comment
@@ -796,7 +793,7 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 
 ---
 
-Further Work
+# Further Work
 
 - flexdashboard
 
@@ -808,7 +805,22 @@ Further Work
 
 - consider who our speakers are/if we are involving the community 
 
+--
+
 ---
 
-Thank You
+# Thank You
 
+- Sebastian Teran Hidalgo
+
+--
+
+- Laura Janda
+
+--
+
+- Samuel Crane
+
+--
+
+- R-Ladies NYC!!! 
