@@ -70,7 +70,7 @@ class: center, middle, inverse, title-slide
 
 ```r
 urlname &lt;- "rladies-newyork"
-events &lt;- get_events(urlname, "past")
+events &lt;- meetupr::get_events(urlname, "past")
 ```
 
 
@@ -79,10 +79,11 @@ colnames(events)
 ```
 
 ```
-##  [1] "id"              "name"            "created"         "status"          "time"           
-##  [6] "local_date"      "local_time"      "waitlist_count"  "yes_rsvp_count"  "venue_id"       
-## [11] "venue_name"      "venue_lat"       "venue_lon"       "venue_address_1" "venue_city"     
-## [16] "venue_state"     "venue_zip"       "venue_country"   "description"     "link"           
+##  [1] "id"              "name"            "created"         "status"         
+##  [5] "time"            "local_date"      "local_time"      "waitlist_count" 
+##  [9] "yes_rsvp_count"  "venue_id"        "venue_name"      "venue_lat"      
+## [13] "venue_lon"       "venue_address_1" "venue_city"      "venue_state"    
+## [17] "venue_zip"       "venue_country"   "description"     "link"           
 ## [21] "resource"
 ```
 
@@ -244,7 +245,7 @@ ggplot(events_normal_labels,
 
 
 ```r
-members &lt;- get_members(urlname)
+members &lt;- meetupr::get_members(urlname)
 ```
 
 
@@ -297,7 +298,7 @@ new_members &lt;- members %&gt;%
   mutate(date = as.Date(created)) %&gt;% 
   group_by(date) %&gt;% 
   summarise(count_new_members = n()) %&gt;% 
-  complete(date = seq.Date(min(date), max(date), by = "day")) 
+  tidyr::complete(date = seq.Date(min(date), max(date), by = "day")) 
 
 # make event dataset to merge with
 events_dates &lt;- events %&gt;% 
@@ -320,7 +321,6 @@ members_events_count &lt;-
   group_by(event_group) %&gt;% 
   summarise(new_members = sum(count_new_members, na.rm = TRUE))
 
-# merge members with complete dates and events 
 # get event dates for event groups
 members_events_groups &lt;- 
   left_join(new_members, events_dates, by = "date") %&gt;% 
@@ -439,7 +439,9 @@ ggplot(members_events_all_days,
 
 ```r
 # all attendees for one event
-attendees &lt;- get_event_attendees(urlname, event_id = "235073330")
+attendees &lt;- 
+  meetupr::get_event_attendees(urlname, 
+                               event_id = "235073330")
 
 # get all event ids 
 event_ids &lt;- events$id
@@ -567,22 +569,13 @@ background-position: center top
 
 
 
-
----
-
-class: top
-
-# Word Cloud - Event Descriptions
-
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-40-1.png" width="85%" /&gt;
-
 ---
 
 # Word Cloud - Comments
 
 
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-42-1.png" width="85%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-41-1.png" width="85%" /&gt;
 
 
 ---

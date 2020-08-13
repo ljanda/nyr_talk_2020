@@ -127,7 +127,7 @@ include_graphics(here::here("images/rladies_hex.png"))
 
 ```{r eval=FALSE}
 urlname <- "rladies-newyork"
-events <- get_events(urlname, "past")
+events <- meetupr::get_events(urlname, "past")
 ```
 
 ```{r}
@@ -307,7 +307,7 @@ ggplot(events_normal_labels,
 # Look at members data 
 
 ```{r eval=FALSE}
-members <- get_members(urlname)
+members <- meetupr::get_members(urlname)
 ```
 
 ```{r}
@@ -362,7 +362,7 @@ new_members <- members %>%
   mutate(date = as.Date(created)) %>% 
   group_by(date) %>% 
   summarise(count_new_members = n()) %>% 
-  complete(date = seq.Date(min(date), max(date), by = "day")) 
+  tidyr::complete(date = seq.Date(min(date), max(date), by = "day")) 
 
 # make event dataset to merge with
 events_dates <- events %>% 
@@ -384,7 +384,6 @@ members_events_count <-
   group_by(event_group) %>% 
   summarise(new_members = sum(count_new_members, na.rm = TRUE))
 
-# merge members with complete dates and events 
 # get event dates for event groups
 members_events_groups <- 
   left_join(new_members, events_dates, by = "date") %>% 
@@ -548,7 +547,9 @@ ggplot(members_events_all_days,
 
 ```{r eval=FALSE}
 # all attendees for one event
-attendees <- get_event_attendees(urlname, event_id = "235073330")
+attendees <- 
+  meetupr::get_event_attendees(urlname, 
+                               event_id = "235073330")
 
 # get all event ids 
 event_ids <- events$id
@@ -682,53 +683,6 @@ event_locations <-
         axis.ticks = element_blank())
 
 ggsave("images/event_locations.png", event_locations)
-```
-
-
----
-
-class: top
-
-# Word Cloud - Event Descriptions
-
-```{r, echo=FALSE, warning=FALSE, out.width="85%"}
-# http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
-e3 <- events %>% 
-  mutate(description = str_remove_all(description, "R-Ladies"),
-         description = str_remove_all(description, "R-ladies"),
-         description = str_remove_all(description, "Rladies"),
-         description = str_remove_all(description, "New York"),
-         description = str_remove_all(description, "NYC"),
-         description = str_remove_all(description, "Online event"),
-         description = str_remove_all(description, "Book Club"), 
-         description = str_remove_all(description, "book club"), 
-         description = str_remove_all(description, "Workshop"), 
-         description = str_remove_all(description, "ladies"))
-text <- e3$description
-text <- gsub("[[:punct:]]|[[:digit:]]", "", text)
-docs <- Corpus(VectorSource(text))
-# Convert the text to lower case
-docs <- tm_map(docs, content_transformer(tolower))
-# Remove english common stopwords
-docs <- tm_map(docs, removeWords, stopwords("english"))
-# specify your stopwords as a character vector
-docs <- tm_map(docs, removeWords, c("and", "with", "the", "will", 
-                                    "event", "can", "using", 
-                                    "she", "for", "from", "not", "how", 
-                                    "please", "also", "use", "talk", "pwe", 
-                                    "want", "email", "twitter", "phd", "well", 
-                                    "columbia", "university", "kaelen", "emily", 
-                                    "erin", "elizabeth")) 
-docs <- tm_map(docs, stripWhitespace)
-dtm <- TermDocumentMatrix(docs)
-m <- as.matrix(dtm)
-v <- sort(rowSums(m),decreasing=TRUE)
-d <- data.frame(word = names(v),freq=v)
-
-wordcloud(words = d$word, freq = d$freq, min.freq = 1,
-          max.words = 200, random.order = FALSE, rot.per = 0.35, 
-          colors = brewer.pal(10, "Paired"))
-
 ```
 
 ---
