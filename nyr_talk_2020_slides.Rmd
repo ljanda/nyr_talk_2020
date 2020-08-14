@@ -94,14 +94,6 @@ theme_rladies <- function () {
 include_graphics(here::here("images/rladies_global.png"))
 ```
 
----
-
-# This talk will focus on R-Ladies NYC
-
-```{r echo=FALSE, out.width="60%"}
-include_graphics(here::here("images/rladies_hex.png"))
-```
-
 
 ---
 
@@ -109,15 +101,18 @@ include_graphics(here::here("images/rladies_hex.png"))
 
 --
 
-- An in-depth look at the R-Ladies NYC meetup data
+- An exploration at the R-Ladies NYC meetup data
 
---
-
-- An attempt to quantify our existence
 
 --
 
 - A look at the code used to do this
+
+
+
+```{r echo=FALSE, out.width="60%", fig.align="center"}
+include_graphics(here::here("images/rladies_hex.png"))
+```
 
 ---
 
@@ -142,16 +137,12 @@ nrow(events)
 
 ---
 
-# Event RSVP Counts on Average?
+# Are our RSVP counts trending upwards?
 
 ```{r}
 summary(events$yes_rsvp_count)
 ```
 
-
----
-
-# Are our RSVP counts trending upwards?
 
 ```{r eval=FALSE}
 ggplot(events, aes(local_date, yes_rsvp_count)) + 
@@ -774,6 +765,10 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 --
 
 - Samuel Crane
+
+--
+
+- Ayanthi Gunawardana
 
 --
 

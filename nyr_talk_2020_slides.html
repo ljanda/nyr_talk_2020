@@ -38,12 +38,6 @@ class: center, middle, inverse, title-slide
 
 &lt;img src="/Users/ljanda/Documents/misc/nyr_talk_2020/images/rladies_global.png" width="100%" /&gt;
 
----
-
-# This talk will focus on R-Ladies NYC
-
-&lt;img src="/Users/ljanda/Documents/misc/nyr_talk_2020/images/rladies_hex.png" width="60%" /&gt;
-
 
 ---
 
@@ -51,15 +45,16 @@ class: center, middle, inverse, title-slide
 
 --
 
-- An in-depth look at the R-Ladies NYC meetup data
+- An exploration at the R-Ladies NYC meetup data
 
---
-
-- An attempt to quantify our existence
 
 --
 
 - A look at the code used to do this
+
+
+
+&lt;img src="/Users/ljanda/Documents/misc/nyr_talk_2020/images/rladies_hex.png" width="60%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -100,7 +95,7 @@ nrow(events)
 
 ---
 
-# Event RSVP Counts on Average?
+# Are our RSVP counts trending upwards?
 
 
 ```r
@@ -112,10 +107,6 @@ summary(events$yes_rsvp_count)
 ##   20.00   42.00   55.00   56.68   71.50  103.00
 ```
 
-
----
-
-# Are our RSVP counts trending upwards?
 
 
 ```r
@@ -131,7 +122,7 @@ ggplot(events, aes(local_date, yes_rsvp_count)) +
 
 # Are our RSVP counts trending upwards?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-12-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-11-1.png" width="75%" /&gt;
 
 
 ---
@@ -163,7 +154,7 @@ ggplot(events_low_labels,
 
 # What are those low RSVP count events?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-14-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-13-1.png" width="75%" /&gt;
 
 
 ---
@@ -208,7 +199,7 @@ ggplot(events_normal, aes(local_date, yes_rsvp_count)) +
 
 # Trending Up?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-18-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-17-1.png" width="75%" /&gt;
 
 
 ---
@@ -236,7 +227,7 @@ ggplot(events_normal_labels,
 
 # What were those "popular" events?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-20-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-19-1.png" width="75%" /&gt;
 
 
 ---
@@ -283,7 +274,7 @@ ggplot(members_month, aes(year_month, count_new_members)) +
 
 # Count of new members by month
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-24-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-23-1.png" width="75%" /&gt;
 
 
 ---
@@ -361,7 +352,7 @@ members_events %&gt;%
 
 # New members by nearest upcoming event
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-28-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-27-1.png" width="75%" /&gt;
 
 
 ---
@@ -393,7 +384,7 @@ ggplot(members_events,
 
 # Hadley Wickham Bump?
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-30-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-29-1.png" width="75%" /&gt;
 
 
 ---
@@ -429,7 +420,7 @@ ggplot(members_events_all_days,
 
 # Member counts with events 
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-32-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-31-1.png" width="75%" /&gt;
 
 
 ---
@@ -480,7 +471,7 @@ ggplot(attendee_rsvp_counts, aes(count_events_rsvp)) +
 
 # Loyalty
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-35-1.png" width="75%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-34-1.png" width="75%" /&gt;
 
 
 
@@ -575,7 +566,7 @@ background-position: center top
 
 
 
-&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-41-1.png" width="85%" /&gt;
+&lt;img src="nyr_talk_2020_slides_files/figure-html/unnamed-chunk-40-1.png" width="85%" /&gt;
 
 
 ---
@@ -607,6 +598,10 @@ background-position: center top
 --
 
 - Samuel Crane
+
+--
+
+- Ayanthi Gunawardana
 
 --
 
