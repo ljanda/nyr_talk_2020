@@ -676,6 +676,22 @@ event_locations <-
 ggsave("images/event_locations.png", event_locations)
 ```
 
+
+---
+
+# Further Work
+
+- flexdashboard
+
+--
+
+- automate website event posts
+
+--
+
+- consider who our speakers are/if we are involving the community 
+
+
 ---
 
 # Word Cloud - Comments
@@ -738,21 +754,7 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
 
 ---
 
-# Further Work
 
-- flexdashboard
-
---
-
-- automate website event posts
-
---
-
-- consider who our speakers are/if we are involving the community 
-
---
-
----
 
 # Thank You
 
